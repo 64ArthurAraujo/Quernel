@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "screen.h": "c",
+        "ports.h": "c",
+        "memory.h": "c",
+        "isr.h": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/arthur/projects/Quernel",
+            "binaryPath": "/home/arthur/projects/Quernel/format",
+            "binaryArgs": []
+        }
+    ]
+}
