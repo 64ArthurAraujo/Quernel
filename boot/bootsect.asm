@@ -38,8 +38,7 @@ BEGIN_PM:
     mov ebx, MSG_PROT_MODE
     call print_string_pm
     call KERNEL_OFFSET ; Give control to the kernel
-    jmp $ ; Stay here when the kernel returns control to us
- (if ever)
+    jmp $ ; Stay here when the kernel returns control to us (if ever)
 
 BOOT_DRIVE db 0
 MSG_REAL_MODE db "Started in 16-bit Real Mode", 0
