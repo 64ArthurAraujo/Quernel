@@ -3,7 +3,8 @@
         "screen.h": "c",
         "ports.h": "c",
         "memory.h": "c",
-        "isr.h": "c"
+        "isr.h": "c",
+        "stdint.h": "c"
     },
     "makefile.launchConfigurations": [
         {
@@ -11,5 +12,6 @@
             "binaryPath": "/home/arthur/projects/Quernel/format",
             "binaryArgs": []
         }
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "disabled",
 }

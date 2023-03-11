@@ -14,10 +14,11 @@ void load_irq_gates();
 
 void isr_setup()
 {
+    kprint("Doing ISR setup...\n");
+
     load_isr_gates();
     remap_pic();
     load_irq_gates();
-
     set_idt(); // Sets with assembly
 }
 

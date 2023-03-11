@@ -61,5 +61,6 @@ static void keyboard_callback(registers_t regs)
 
 void init_keyboard()
 {
+    kprint("Initializing keyboard...\n");
     register_interrupt_handler(IRQ1, keyboard_callback); // IRQ1 receives keyboard callback
 }
