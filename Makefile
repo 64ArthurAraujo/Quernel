@@ -1,6 +1,6 @@
-CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
-LD = /usr/local/i386elfgcc/bin/i386-elf-ld
-GDB = /usr/local/i386elfgcc/bin/i386-elf-gdb
+CC = /home/arthur/elf-tools/bin/i686-elf-gcc
+LD = /home/arthur/elf-tools/bin/i686-elf-ld
+GDB = /home/arthur/elf-tools/bin/i686-elf-gdb
 CFLAGS = -g
 
 C_SOURCES = $(wildcard */*.c)
