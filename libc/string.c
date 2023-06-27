@@ -71,13 +71,17 @@ int strlen(char str[])
 
 void reverse_str(char str[])
 {
-    int c, i, j;
+    int left = 0;
+    int right = strlen(str) - 1;
 
-    for (i = 0, j = strlen(str) - 1; i < j; i++, j--)
+    while (left < right)
     {
-        c = str[i];
-        str[i] = str[j];
-        str[j] = c;
+        char temp = str[left];
+        str[left] = str[right];
+        str[right] = temp;
+
+        left++;
+        right--;
     }
 }
 
@@ -103,4 +107,43 @@ int strcmp(char s1[], char s2[])
             return 0;
     }
     return s1[i] - s2[i];
+}
+
+void reverse(char str[], int length)
+{
+    int start = 0;
+    int end = length - 1;
+    while (start < end)
+    {
+        char tmp = *(str + start);
+        *(str + start) = *(str + end);
+        *(str + end) = tmp;
+        start++;
+        end--;
+    }
+}
+
+char *itoa(uint8_t num, char *str, int base)
+{
+    int i = 0;
+    if (num == 0)
+    {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+    while (num != 0)
+    {
+        int rem = num % base;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / base;
+    }
+    if (base == 16)
+    {
+        str[i++] = 'x';
+        str[i++] = '0';
+    }
+    str[i] = '\0';
+    reverse(str, i);
+    return str;
 }
