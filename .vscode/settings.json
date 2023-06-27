@@ -4,7 +4,11 @@
         "ports.h": "c",
         "memory.h": "c",
         "isr.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "keyboard.h": "c",
+        "cpuid.h": "c",
+        "string.h": "c",
+        "rtc.h": "c"
     },
     "makefile.launchConfigurations": [
         {
