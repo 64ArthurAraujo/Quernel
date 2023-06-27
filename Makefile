@@ -1,7 +1,7 @@
-CC = /home/arthur/elf-tools/bin/i686-elf-gcc
-LD = /home/arthur/elf-tools/bin/i686-elf-ld
-GDB = /home/arthur/elf-tools/bin/i686-elf-gdb
-CFLAGS = -g
+CC = /home/arthur/ccompilers/bin/i686-elf-gcc
+LD = /home/arthur/ccompilers/bin/i686-elf-ld
+GDB = /home/arthur/ccompilers/bin/i686-elf-gdb
+CFLAGS = -g 
 
 C_SOURCES = $(wildcard */*.c)
 HEADERS = $(wildcard */include/*.h)
@@ -19,8 +19,11 @@ kernel.bin: boot/kernel_entry.o ${OBJ}
 kernel.elf: boot/kernel_entry.o ${OBJ}
 	${LD} -o $@ -Ttext 0x1000 $^ 
 
-run: os-image.bin
-	qemu-system-i386 -fda os-image.bin
+add-files:	os-image.bin
+	cat root/hello.q >> os-image.bin
+
+run: add-files
+	qemu-system-i386 -drive format=raw,file=os-image.bin
 
 debug: os-image.bin kernel.elf
 	qemu-system-i386 -s -fda os-image.bin &
@@ -37,3 +40,4 @@ debug: os-image.bin kernel.elf
 
 clean:
 	rm -rf ${CLEAN_TARGETS}
+
