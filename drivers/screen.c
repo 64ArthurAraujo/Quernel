@@ -27,6 +27,18 @@ void kprint_at(char *message, int col, int row)
         col = get_offset_col(offset);
     }
 
+    /* Clear buffer at specified location */
+    char *vidptr = (char *)VIDEO_ADDRESS;
+    vidptr += offset * 2;
+    for (int i = 0; i < MAX_ROWS; i++)
+    {
+        for (int j = 0; j < MAX_COLS; j++)
+        {
+            *vidptr++ = ' ';
+            *vidptr++ = WHITE_ON_BLACK;
+        }
+    }
+
     // Loop through message and print it
     int i = 0;
     while (message[i] != 0)
@@ -43,12 +55,26 @@ void kprint(char *message)
     kprint_at(message, -1, -1);
 }
 
+void kprintln(char *message)
+{
+    kprint(message);
+    kprint("\n");
+}
+
 void kprint_backspace()
 {
     int offset = get_cursor_offset() - 2;
     int row = get_offset_row(offset);
     int col = get_offset_col(offset);
     print_char(0x08, col, row, WHITE_ON_BLACK);
+}
+
+void klog(char * message, char * domain) {
+    kprint("[ </> ] ");
+
+    kprint(domain);
+    kprint(": ");
+    kprintln(message);
 }
 
 int print_char(char c, int col, int row, char attr)
