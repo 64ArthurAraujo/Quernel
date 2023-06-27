@@ -1,8 +1,8 @@
-#include "include/isr.h"
-#include "include/idt.h"
 #include "../drivers/include/screen.h"
 #include "../cpu/include/ports.h"
 #include "../libc/include/string.h"
+#include "include/isr.h"
+#include "include/idt.h"
 #include <stdint.h>
 
 isr_t interrupt_handlers[256];
@@ -14,7 +14,7 @@ void load_irq_gates();
 
 void isr_setup()
 {
-    kprint("Doing ISR setup...\n");
+    klog("Doing setup", DOMAIN);
 
     load_isr_gates();
     remap_pic();
@@ -132,8 +132,8 @@ char *exception_messages[] = {
 };
 
 void isr_handler(registers_t r)
-{
-    kprint("Received interrupt: ");
+{   
+    klog("Received interrupt", DOMAIN);
     char s[3];
     int_to_ascii(r.int_no, s);
     kprint(s);

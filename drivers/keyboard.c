@@ -1,10 +1,10 @@
-#include "include/keyboard.h"
 #include "../cpu/include/ports.h"
 #include "../cpu/include/isr.h"
 #include "include/screen.h"
 #include "../libc/include/string.h"
-#include "../kernel/include/io.h"
+#include "../kernel/include/keycmds.h"
 #include "../libc/include/function.h"
+#include "include/keyboard.h"
 #include <stdint.h>
 
 #define BACKSPACE 0x0E
@@ -61,6 +61,6 @@ static void keyboard_callback(registers_t regs)
 
 void init_keyboard()
 {
-    kprint("Initializing keyboard...\n");
+    klog("Initializing keyboard interrupt handlers", DOMAIN);
     register_interrupt_handler(IRQ1, keyboard_callback); // IRQ1 receives keyboard callback
 }

@@ -14,3 +14,5 @@
 void clear_screen();
 void kprint_at(char *message, int col, int row);
 void kprint(char *message);
+void kprintln(char *message);
+void klog(char *message, char *domain);
