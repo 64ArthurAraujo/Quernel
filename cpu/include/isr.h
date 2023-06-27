@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#define DOMAIN "ISR"
+
 /* Struct which aggregates many registers */
 typedef struct
 {
