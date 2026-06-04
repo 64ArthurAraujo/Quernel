@@ -1,5 +1,8 @@
 #include <stdint.h>
 
+
+void append(char s[], char n);
+
 void int_to_ascii(int n, char str[])
 {
     int i, sign;
@@ -23,7 +26,7 @@ void int_to_ascii(int n, char str[])
 void hex_to_ascii(int hex, char str[])
 {
     append(str, 0);
-    append(str, "x");
+    append(str, 'x');
 
     char zeros = 0;
     int32_t tmp;

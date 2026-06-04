@@ -117,12 +117,12 @@ int print_char(char c, int col, int row, char attr)
         for (i = 1; i < MAX_ROWS; i++)
         {
             mem_copy(
-                get_offset(0, i) + VIDEO_ADDRESS,
-                get_offset(0, i - 1) + VIDEO_ADDRESS,
+                (char *) get_offset(0, i) + VIDEO_ADDRESS,
+                (char *) get_offset(0, i - 1) + VIDEO_ADDRESS,
                 MAX_COLS * 2);
         }
 
-        char *last_line = get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS;
+        char *last_line = (char *) (get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
 
         for (i = 0; i < MAX_COLS * 2; i++)
             last_line[i] = 0;
@@ -161,7 +161,7 @@ void clear_screen()
 {
     int screen_size = MAX_COLS * MAX_ROWS;
     int i;
-    char *screen = VIDEO_ADDRESS;
+    char *screen = (char *) VIDEO_ADDRESS;
 
     for (i = 0; i < screen_size; i++)
     {

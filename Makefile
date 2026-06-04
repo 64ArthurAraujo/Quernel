@@ -1,7 +1,7 @@
-CC = /home/arthur/ccompilers/bin/i686-elf-gcc
-LD = /home/arthur/ccompilers/bin/i686-elf-ld
-GDB = /home/arthur/ccompilers/bin/i686-elf-gdb
-CFLAGS = -g 
+CC = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-gcc
+LD = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-ld
+GDB = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-gdb
+CFLAGS = -g -m32
 
 C_SOURCES = $(wildcard */*.c)
 HEADERS = $(wildcard */include/*.h)
@@ -22,7 +22,7 @@ kernel.elf: boot/kernel_entry.o ${OBJ}
 add-files:	os-image.bin
 	cat root/hello.q >> os-image.bin
 
-run: add-files
+run: os-image.bin
 	qemu-system-i386 -drive format=raw,file=os-image.bin
 
 debug: os-image.bin kernel.elf
