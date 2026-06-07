@@ -12,6 +12,6 @@ void init_kernel()
     asm volatile("sti");
     init_keyboard();
 
-    ata_detect_drives();
     cpuid_detect();
+    ata_detect_drives();
 }
