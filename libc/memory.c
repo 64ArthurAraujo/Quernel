@@ -10,7 +10,7 @@ void mem_copy(char *source, char *dest, int nbytes)
     }
 }
 
-void memory_set(uint8_t *dest, uint8_t val, uint32_t len)
+void memory_set(void *dest, uint8_t val, uint32_t len)
 {
     uint8_t *temp = (uint8_t *)dest;
     for (; len != 0; len--)
