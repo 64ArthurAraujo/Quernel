@@ -61,6 +61,5 @@ static void keyboard_callback(registers_t regs)
 
 void init_keyboard()
 {
-    klog("Initializing keyboard interrupt handlers", DOMAIN);
     register_interrupt_handler(IRQ1, keyboard_callback); // IRQ1 receives keyboard callback
 }

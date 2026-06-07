@@ -6,12 +6,8 @@
 #include "../drivers/include/ata.h"
 #include "../cpu/include/cpuid.h"
 
-/* Differently named so it doest overlap with other domains */
-#define ROOT_DOMAIN "QUERNEL"
-
 void init_kernel()
 {
-    clear_screen();
     isr_setup();
     asm volatile("sti");
     init_keyboard();

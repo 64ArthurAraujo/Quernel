@@ -14,8 +14,6 @@ void load_irq_gates();
 
 void isr_setup()
 {
-    klog("Doing setup", DOMAIN);
-
     load_isr_gates();
     remap_pic();
     load_irq_gates();
