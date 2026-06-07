@@ -10,6 +10,13 @@ KERNEL_OFFSET equ 0x1000 ; same offset when linking the kernel
     call print_nl
 
     call load_kernel ; read the kernel from disk
+    
+    ; Enable A20 line
+    in al, 0x92
+    or al, 0x02
+    out 0x92, al
+
+
     call switch_to_pm ; disable interrupts, load GDT,  etc. Finally jumps to 'BEGIN_PM'
 
     jmp $ ; Never executed
@@ -28,7 +35,7 @@ load_kernel:
     call print_nl
 
     mov bx, KERNEL_OFFSET ; Read from disk and store in 0x1000
-    mov dh, 16 
+    mov dh, 25 
     mov dl, [BOOT_DRIVE]
     call disk_load
     ret
