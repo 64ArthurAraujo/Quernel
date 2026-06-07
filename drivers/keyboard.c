@@ -1,6 +1,6 @@
 #include "../cpu/include/ports.h"
 #include "../cpu/include/isr.h"
-#include "include/screen.h"
+#include "include/tty.h"
 #include "../libc/include/string.h"
 #include "../kernel/include/keycmds.h"
 #include "../libc/include/function.h"

@@ -1,5 +1,5 @@
 #include "../libc/include/memory.h"
-#include "include/screen.h"
+#include "include/tty.h"
 #include "../cpu/include/ports.h"
 
 // declare the functions before so we dont get a compiler warning

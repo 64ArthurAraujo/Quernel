@@ -1,5 +1,5 @@
 #include "include/cpuid.h"
-#include "../drivers/include/screen.h"
+#include "../drivers/include/tty.h"
 #include "../libc/include/memory.h"
 #include <stdint.h>
 

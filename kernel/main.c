@@ -1,4 +1,4 @@
-#include "../drivers/include/screen.h"
+#include "../drivers/include/tty.h"
 #include "../cpu/include/isr.h"
 #include "../cpu/include/timer.h"
 #include "../drivers/include/keyboard.h"

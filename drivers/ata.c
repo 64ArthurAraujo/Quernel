@@ -1,5 +1,5 @@
 #include "include/ata.h"
-#include "include/screen.h"
+#include "include/tty.h"
 #include "../cpu/include/ports.h"
 #include "../libc/include/memory.h"
 

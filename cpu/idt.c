@@ -1,6 +1,6 @@
 #include "include/idt.h"
 #include "../libc/include/memory.h"
-#include "../drivers/include/screen.h"
+#include "../drivers/include/tty.h"
 #include <stdint.h>
 
 void set_idt_gate(int n, uint32_t handler)

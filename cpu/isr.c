@@ -1,4 +1,4 @@
-#include "../drivers/include/screen.h"
+#include "../drivers/include/tty.h"
 #include "../cpu/include/ports.h"
 #include "../libc/include/string.h"
 #include "include/isr.h"
