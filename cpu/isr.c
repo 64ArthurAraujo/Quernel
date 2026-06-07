@@ -131,7 +131,9 @@ char *exception_messages[] = {
 
 void isr_handler(registers_t r)
 {   
-    klog("Received interrupt", DOMAIN);
+    // for some reason if the string is not this big it causes a disk read error in qemu (??????)
+    kprintln("Received interrupt||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
     char s[3];
     int_to_ascii(r.int_no, s);
     kprint(s);
