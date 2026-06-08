@@ -1,5 +1,19 @@
 #include <stdint.h>
 
+int mem_cmp(const void *__s1, const void *__s2, int __n)
+{
+    const uint8_t *a = (const uint8_t *)__s1;
+    const uint8_t *b = (const uint8_t *)__s2;
+
+    for (int i = 0; i < __n; i++)
+    {
+        if (a[i] != b[i])
+            return a[i] - b[i];
+    }
+
+    return 0;
+}
+
 void mem_copy(char *source, char *dest, int nbytes)
 {
     int i;
