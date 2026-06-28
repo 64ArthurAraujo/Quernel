@@ -22,6 +22,5 @@ void init_kernel()
     cpuid_detect();
     ata_detect_drives();
 
-    kprintln("Halting");
-
+    asm volatile("hlt");
 }

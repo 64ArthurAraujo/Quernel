@@ -18,7 +18,7 @@ quernel.iso: kernel.elf
 	grub2-mkrescue -o quernel.iso iso/
 
 run: quernel.iso
-	qemu-system-i386 -cdrom quernel.iso
+	qemu-system-i386 -drive format=raw,file=quernel.iso,index=0,media=disk
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
