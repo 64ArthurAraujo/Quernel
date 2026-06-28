@@ -76,7 +76,7 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive)
 
 void ata_detect_drives()
 {
-    memory_set(ata_drives, 0, sizeof(ata_drives));
+    memset(ata_drives, 0, sizeof(ata_drives));
 
     const char *channel_names[] = {"Primary", "Secondary"};
     const char *role_names[] = {"Master", "Slave"};

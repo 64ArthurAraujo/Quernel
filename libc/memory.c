@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-int mem_cmp(const void *__s1, const void *__s2, int __n)
+int memcmp(const void *__s1, const void *__s2, int __n)
 {
     const uint8_t *a = (const uint8_t *)__s1;
     const uint8_t *b = (const uint8_t *)__s2;
@@ -14,7 +14,7 @@ int mem_cmp(const void *__s1, const void *__s2, int __n)
     return 0;
 }
 
-void mem_copy(char *source, char *dest, int nbytes)
+void memcpy(char *source, char *dest, int nbytes)
 {
     int i;
 
@@ -24,7 +24,7 @@ void mem_copy(char *source, char *dest, int nbytes)
     }
 }
 
-void memory_set(void *dest, uint8_t val, uint32_t len)
+void memset(void *dest, uint8_t val, uint32_t len)
 {
     uint8_t *temp = (uint8_t *)dest;
     for (; len != 0; len--)

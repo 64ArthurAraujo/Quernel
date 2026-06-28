@@ -43,9 +43,9 @@ void cpuid_detect()
 
     cpuid(0x0, &eax, &ebx, &ecx, &edx);
 
-    mem_copy((uint8_t *)&ebx, (uint8_t *)&cpu_info.vendor[0], 4);
-    mem_copy((uint8_t *)&edx, (uint8_t *)&cpu_info.vendor[4], 4);
-    mem_copy((uint8_t *)&ecx, (uint8_t *)&cpu_info.vendor[8], 4);
+    memcpy((uint8_t *)&ebx, (uint8_t *)&cpu_info.vendor[0], 4);
+    memcpy((uint8_t *)&edx, (uint8_t *)&cpu_info.vendor[4], 4);
+    memcpy((uint8_t *)&ecx, (uint8_t *)&cpu_info.vendor[8], 4);
 
     cpu_info.vendor[12] = '\0';
 
