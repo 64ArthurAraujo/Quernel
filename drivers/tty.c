@@ -27,18 +27,6 @@ void kprint_at(char *message, int col, int row)
         col = get_offset_col(offset);
     }
 
-    /* Clear buffer at specified location */
-    char *vidptr = (char *)VIDEO_ADDRESS;
-    vidptr += offset * 2;
-    for (int i = 0; i < MAX_ROWS; i++)
-    {
-        for (int j = 0; j < MAX_COLS; j++)
-        {
-            *vidptr++ = ' ';
-            *vidptr++ = WHITE_ON_BLACK;
-        }
-    }
-
     // Loop through message and print it
     int i = 0;
     while (message[i] != 0)
