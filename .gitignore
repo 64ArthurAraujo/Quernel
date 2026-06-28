@@ -1,3 +1,5 @@
 *.o
 *.bin
 iso/
+kernel.elf
+quernel.iso
