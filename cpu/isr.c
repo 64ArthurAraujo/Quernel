@@ -11,9 +11,11 @@ isr_t interrupt_handlers[256];
 void load_isr_gates();
 void remap_pic();
 void load_irq_gates();
+void ps2_disable_mouse();
 
 void isr_setup()
 {
+    ps2_disable_mouse();
     load_isr_gates();
     remap_pic();
     load_irq_gates();
@@ -133,7 +135,7 @@ char *exception_messages[] = {
 };
 
 void isr_handler(registers_t r)
-{   
+{
     // for some reason if the string is not this big it causes a disk read error in qemu (??????)
     kprintln("Received interrupt||||||||||||||||||||||||||||||||||||||||||||||||||||||");
 
@@ -164,4 +166,10 @@ void irq_handler(registers_t r)
         isr_t handler = interrupt_handlers[r.int_no];
         handler(r);
     }
+}
+
+void ps2_disable_mouse()
+{
+    while (port_byte_in(0x64) & 0x02);
+    port_byte_out(0x64, 0xA7);
 }

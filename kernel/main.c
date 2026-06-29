@@ -10,10 +10,8 @@
 void init_kernel()
 {
     isr_setup();
-
-
     asm volatile("sti");
-    
+
     // unmask only keyboard
     port_byte_out(0x21, 0xFD);
 
