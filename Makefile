@@ -8,6 +8,10 @@ C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c)
 HEADERS   = $(wildcard */include/*.h)
 OBJ       = $(C_SOURCES:.c=.o) cpu/interrupt.o
 
+debug: quernel.iso kernel.elf
+	qemu-system-i386 -S -s -drive format=raw,file=quernel.iso,index=0,media=disk &
+	gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf" -ex "break init_kernel"
+
 kernel.elf: boot/kernel_entry.o $(OBJ)
 	$(LD) -T linker.ld -o $@ $^
 
