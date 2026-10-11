@@ -2,7 +2,6 @@
 #include "include/tty.h"
 #include "../cpu/include/ports.h"
 #include "../libc/include/memory.h"
-#include "../asm/include/io.h"
 
 ata_drive_t ata_drives[4];
 
@@ -84,7 +83,7 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive)
 void read_sector_data(uint16_t base, uint16_t *buffer)
 {
     for (int i = 0; i < 256; i++)
-        buffer[i] = inw(base);
+        buffer[i] = port_word_in(base);
 }
 
 void ata_read_28bit_pio(ata_drive_t *drive, uint32_t lba_offset)
