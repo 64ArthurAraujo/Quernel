@@ -6,6 +6,25 @@
 #include "../drivers/include/ata.h"
 #include "../cpu/include/cpuid.h"
 #include "../cpu/include/ports.h"
+#include <stdint.h>
+
+void read_ata_drive(int index)
+{
+    ata_drive_t *drive = get_ata_drive(index);
+
+    for (uint32_t i = 0; i < drive->sectors; i++) 
+    {
+        uint16_t buffer[256];
+        ata_read_28bit_pio(buffer, drive, i);
+
+        hexdump((uint8_t *) buffer, 512); 
+    }
+
+    uint16_t buffer[256];
+    ata_read_28bit_pio(buffer, drive, 0);
+
+    hexdump((uint8_t *) buffer, 512);
+}
 
 void init_kernel()
 {
@@ -19,9 +38,6 @@ void init_kernel()
 
     cpuid_detect();
     ata_detect_drives();
-    
-    ata_drive_t *drive = get_ata_drive(0);
-    ata_read_28bit_pio(drive, 0);
     
     asm volatile("hlt");
 }

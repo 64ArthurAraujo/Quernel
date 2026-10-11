@@ -84,7 +84,7 @@ void read_sector_data(uint16_t base, uint16_t *buffer)
         buffer[i] = port_word_in(base);
 }
 
-void ata_read_28bit_pio(ata_drive_t *drive, uint32_t lba_offset)
+void ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset)
 {
     uint16_t base = drive->base;
     uint16_t ctrl = (base == ATA_PRIMARY_BASE) ? ATA_PRIMARY_CTRL : ATA_SECONDARY_CTRL;
@@ -115,11 +115,7 @@ void ata_read_28bit_pio(ata_drive_t *drive, uint32_t lba_offset)
         return;
     }
 
-    uint16_t buffer[256];
-
     read_sector_data(base, buffer);
-
-    hexdump((uint8_t *)buffer, 512);
 }
 
 void ata_detect_drives()
