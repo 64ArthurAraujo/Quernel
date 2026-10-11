@@ -109,13 +109,13 @@ void ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offse
     uint16_t base = drive->base;
     uint16_t ctrl = (base == ATA_PRIMARY_BASE) ? ATA_PRIMARY_CTRL : ATA_SECONDARY_CTRL;
 
-    port_byte_out(base + ATA_REG_DRIVE_HEAD, 0x0E | (drive->slave << 4) | ((lba_offset >> 24) & 0x0F));
+    port_byte_out(base + ATA_REG_DRIVE_HEAD, 0xE0 | (drive->slave << 4) | ((lba_offset >> 24) & 0x0F));
     ata_delay(ctrl);
     port_byte_out(base + ATA_REG_ERROR, 0x00);
     port_byte_out(base + ATA_REG_SECCOUNT, (unsigned char)1);
-    port_byte_out(base + ATA_REG_LBA_LO, (unsigned char)lba_offset);
-    port_byte_out(base + ATA_REG_LBA_MID, (unsigned char)lba_offset >> 8);
-    port_byte_out(base + ATA_REG_LBA_HI, (unsigned char)lba_offset >> 16);
+    port_byte_out(base + ATA_REG_LBA_LO, (uint8_t)(lba_offset));
+    port_byte_out(base + ATA_REG_LBA_MID, (uint8_t)(lba_offset >> 8));
+    port_byte_out(base + ATA_REG_LBA_HI, (uint8_t)(lba_offset >> 16));
     port_byte_out(base + ATA_REG_STATUS, ATA_CMD_READSECTORS);
     ata_delay(ctrl);
 
