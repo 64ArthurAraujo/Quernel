@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 #define VIDEO_ADDRESS 0xb8000
 #define MAX_ROWS 25
@@ -16,3 +17,4 @@ void kprint_at(char *message, int col, int row);
 void kprint(char *message);
 void kprintln(char *message);
 void klog(char *message, char *domain);
+void hexdump(const uint8_t *buf, int len);

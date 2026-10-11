@@ -19,6 +19,9 @@ void init_kernel()
 
     cpuid_detect();
     ata_detect_drives();
-
+    
+    ata_drive_t *drive = get_ata_drive(0);
+    ata_read_28bit_pio(drive, 0);
+    
     asm volatile("hlt");
 }
