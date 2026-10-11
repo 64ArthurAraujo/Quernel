@@ -45,15 +45,13 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive)
     if (port_byte_in(base + ATA_REG_LBA_MID) || port_byte_in(base + ATA_REG_LBA_HI))
         return 0;
 
-    while (1)
+    while ((status = port_byte_in(base + ATA_REG_STATUS)) & ATA_SR_BSY)
+        ;
+
+    if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
-        status = port_byte_in(base + ATA_REG_STATUS);
-
-        if (status & ATA_SR_ERR)
-            return 0;
-
-        if (!(status & ATA_SR_BSY))
-            break;
+        kprintln("ata_identify: failed to identify disk! Error or drive fault");
+        return 0;
     }
 
     uint16_t buffer[256];
