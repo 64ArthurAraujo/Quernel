@@ -8,22 +8,18 @@
 #include "../cpu/include/ports.h"
 #include <stdint.h>
 
-void read_ata_drive(int index)
+void list_drives()
 {
-    ata_drive_t *drive = get_ata_drive(index);
+    ata_drive_t *drives = get_ata_drives();
 
-    for (uint32_t i = 0; i < drive->sectors; i++) 
+    for (int i = 0; i < 4; i++)
     {
-        uint16_t buffer[256];
-        ata_read_28bit_pio(buffer, drive, i);
-
-        hexdump((uint8_t *) buffer, 512); 
+        if (drives[i].present == 1)
+        {
+            kprint("ATA: ");
+            kprintln((char *) drives[i].model);
+        }
     }
-
-    uint16_t buffer[256];
-    ata_read_28bit_pio(buffer, drive, 0);
-
-    hexdump((uint8_t *) buffer, 512);
 }
 
 void init_kernel()
@@ -38,6 +34,8 @@ void init_kernel()
 
     cpuid_detect();
     ata_detect_drives();
+
+    list_drives();
     
     asm volatile("hlt");
 }

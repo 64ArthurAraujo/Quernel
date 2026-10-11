@@ -2,13 +2,11 @@
 #include "include/tty.h"
 #include "../cpu/include/ports.h"
 #include "../libc/include/memory.h"
+#include "../libc/include/string.h"
 
 ata_drive_t ata_drives[4];
 
-ata_drive_t *get_ata_drive(int index)
-{
-    return &ata_drives[index];
-}
+ata_drive_t *get_ata_drives() { return ata_drives; }
 
 static void ata_delay(uint8_t ctrl)
 {
@@ -78,6 +76,28 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive)
     return 1;
 }
 
+void ata_detect_drives()
+{
+    memset(ata_drives, 0, sizeof(ata_drives));
+
+    int found = 0;
+
+    for (uint8_t ch = 0; ch < 2; ch++)
+    {
+        for (uint8_t sl = 0; sl < 2; sl++)
+        {
+            int idx = ch * 2 + sl;
+
+            if (ata_identify(ch, sl, &ata_drives[idx]))
+                found++;
+        }
+    }
+
+    if (!found)
+        kprintln("ATA unable to detect any devices");
+}
+
+
 void read_sector_data(uint16_t base, uint16_t *buffer)
 {
     for (int i = 0; i < 256; i++)
@@ -116,32 +136,4 @@ void ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offse
     }
 
     read_sector_data(base, buffer);
-}
-
-void ata_detect_drives()
-{
-    memset(ata_drives, 0, sizeof(ata_drives));
-
-    const char *channel_names[] = {"Primary", "Secondary"};
-    const char *role_names[] = {"Master", "Slave"};
-
-    int found = 0;
-
-    for (uint8_t ch = 0; ch < 2; ch++)
-    {
-        for (uint8_t sl = 0; sl < 2; sl++)
-        {
-            int idx = ch * 2 + sl;
-
-            if (ata_identify(ch, sl, &ata_drives[idx]))
-            {
-                kprint("ATA Drive: ");
-                kprintln(ata_drives[idx].model);
-                found++;
-            }
-        }
-    }
-
-    if (!found)
-        kprintln("ATA unable to detect any devices");
 }
