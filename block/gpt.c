@@ -1,7 +1,7 @@
-#include "./include/gpt.h"
-#include "../drivers/include/ata.h"
-#include "../drivers/include/tty.h"
-#include "../libc/include/memory.h"
+#include "./gpt.h"
+#include "../drivers/ata.h"
+#include "../drivers/tty.h"
+#include "../libc/memory.h"
 
 /**
  * returns 1 if valid, 0 on error.

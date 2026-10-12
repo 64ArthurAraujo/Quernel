@@ -1,8 +1,8 @@
-#include "../drivers/include/tty.h"
-#include "../cpu/include/ports.h"
-#include "../libc/include/string.h"
-#include "include/isr.h"
-#include "include/idt.h"
+#include "../drivers/tty.h"
+#include "../cpu/ports.h"
+#include "../libc/string.h"
+#include "isr.h"
+#include "idt.h"
 #include <stdint.h>
 
 isr_t interrupt_handlers[256];

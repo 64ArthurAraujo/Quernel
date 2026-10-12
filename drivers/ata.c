@@ -1,8 +1,8 @@
-#include "include/ata.h"
-#include "include/tty.h"
-#include "../cpu/include/ports.h"
-#include "../libc/include/memory.h"
-#include "../libc/include/string.h"
+#include "../cpu/ports.h"
+#include "../libc/memory.h"
+#include "../libc/string.h"
+#include "ata.h"
+#include "tty.h"
 
 ata_drive_t ata_drives[4];
 

@@ -1,13 +1,13 @@
-#include "../drivers/include/tty.h"
-#include "../cpu/include/isr.h"
-#include "../cpu/include/timer.h"
-#include "../drivers/include/keyboard.h"
-#include "../libc/include/memory.h"
-#include "../drivers/include/ata.h"
-#include "../cpu/include/cpuid.h"
-#include "../cpu/include/ports.h"
-#include "../block/include/gpt.h"
-#include "../libc/include/string.h"
+#include "../drivers/tty.h"
+#include "../cpu/isr.h"
+#include "../cpu/timer.h"
+#include "../drivers/keyboard.h"
+#include "../libc/memory.h"
+#include "../drivers/ata.h"
+#include "../cpu/cpuid.h"
+#include "../cpu/ports.h"
+#include "../block/gpt.h"
+#include "../libc/string.h"
 #include <stdint.h>
 
 void list_drives()

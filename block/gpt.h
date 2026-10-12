@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "../../drivers/include/ata.h"
+#include "../drivers/ata.h"
 
 typedef struct
 {

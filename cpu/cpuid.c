@@ -1,6 +1,6 @@
-#include "include/cpuid.h"
-#include "../drivers/include/tty.h"
-#include "../libc/include/memory.h"
+#include "../drivers/tty.h"
+#include "../libc/memory.h"
+#include "cpuid.h"
 #include <stdint.h>
 
 static void cpuid(uint32_t leaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)

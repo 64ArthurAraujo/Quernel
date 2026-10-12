@@ -1,9 +1,9 @@
-#include "../cpu/include/ports.h"
-#include "../cpu/include/isr.h"
-#include "include/tty.h"
-#include "../libc/include/string.h"
-#include "../libc/include/function.h"
-#include "include/keyboard.h"
+#include "../cpu/ports.h"
+#include "../cpu/isr.h"
+#include "../libc/string.h"
+#include "../libc/function.h"
+#include "keyboard.h"
+#include "tty.h"
 #include <stdint.h>
 
 #define BACKSPACE 0x0E

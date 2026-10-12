@@ -1,6 +1,6 @@
-#include "../libc/include/memory.h"
-#include "include/tty.h"
-#include "../cpu/include/ports.h"
+#include "../libc/memory.h"
+#include "../cpu/ports.h"
+#include "tty.h"
 
 // declare the functions before so we dont get a compiler warning
 int get_cursor_offset();
