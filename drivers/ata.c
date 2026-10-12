@@ -104,7 +104,7 @@ void read_sector_data(uint16_t base, uint16_t *buffer)
         buffer[i] = port_word_in(base);
 }
 
-void ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset)
+int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset)
 {
     uint16_t base = drive->base;
     uint16_t ctrl = (base == ATA_PRIMARY_BASE) ? ATA_PRIMARY_CTRL : ATA_SECONDARY_CTRL;
@@ -126,14 +126,15 @@ void ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offse
     if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
         kprintln("ata_read_28bit_pio: failed to read sectors! Error or drive fault");
-        return;
+        return -1;
     }
 
     if (!(status & ATA_SR_DRQ))
     {
         kprintln("ata_read_28bit_pio: failed to read sectors! No DRQ");
-        return;
+        return -1;
     }
 
     read_sector_data(base, buffer);
+    return 0;
 }

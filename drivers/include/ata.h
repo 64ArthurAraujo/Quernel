@@ -36,7 +36,13 @@ typedef struct {
     uint32_t sectors;
 } ata_drive_t;
 
+typedef struct {
+    ata_drive_t *drive;
+    uint32_t     start;
+    uint32_t     count;  
+} partition_t;
+
 static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive);
 void ata_detect_drives();
 ata_drive_t* get_ata_drives();
-void ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset);
+int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset);

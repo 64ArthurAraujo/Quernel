@@ -150,3 +150,13 @@ char *itoa(uint8_t num, char *str, int base)
     reverse(str, i);
     return str;
 }
+
+void u32_to_str(uint32_t v, char *out)
+{
+    char tmp[11];
+    int n, p = 0;
+
+    do { tmp[n++] = '0' + v % 10; v /= 10; } while (v);
+    while (n) out[p++] = tmp[--n];
+    out[p] = '\0';
+}

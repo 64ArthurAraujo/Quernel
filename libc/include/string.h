@@ -10,3 +10,4 @@ void append(char s[], char n);
 void backspace(char s[]);
 int strcmp(char s1[], char s2[]);
 char *itoa(uint8_t num, char *str, int base);
+void u32_to_str(uint32_t v, char *out);
