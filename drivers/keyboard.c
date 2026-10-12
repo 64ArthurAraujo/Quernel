@@ -2,7 +2,6 @@
 #include "../cpu/include/isr.h"
 #include "include/tty.h"
 #include "../libc/include/string.h"
-#include "../kernel/include/keycmds.h"
 #include "../libc/include/function.h"
 #include "include/keyboard.h"
 #include <stdint.h>
@@ -29,34 +28,7 @@ const char sc_ascii[] = {'?', '?', '1', '2', '3', '4', '5', '6',
 
 static void keyboard_callback(registers_t regs)
 {
-    // PIC leaves the scancode in port 0x60
-    uint8_t scancode = port_byte_in(0x60);
-
-    if (scancode > SC_MAX)
-        return;
-
-    if (scancode == BACKSPACE)
-    {
-        backspace(key_buffer);
-        kprint_backspace();
-    }
-    else if (scancode == ENTER)
-    {
-        kprint("\n");
-        user_input(key_buffer);
-        key_buffer[0] = '\0';
-    }
-    else
-    {
-        char letter = sc_ascii[(int)scancode];
-
-        // kprint only accepts char[] so we do a convertion;
-        char str[2] = {letter, '\0'};
-        append(key_buffer, letter);
-        kprint(str);
-    }
-
-    UNUSED(regs);
+   // disabled
 }
 
 void init_keyboard()
