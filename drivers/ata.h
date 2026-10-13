@@ -46,3 +46,4 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive);
 void ata_detect_drives();
 ata_drive_t* get_ata_drives();
 int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset);
+int read_partition(partition_t *p, uint32_t sector, void *buf);

@@ -19,10 +19,12 @@ void init_kernel()
 
     init_keyboard();
 
+    kprintln("Quernel version 0.0.0.i686");
+
     cpuid_detect();
     ata_detect_drives();
 
-    init_fs();
+    do_mount_root();
 
     asm volatile("hlt");
 }

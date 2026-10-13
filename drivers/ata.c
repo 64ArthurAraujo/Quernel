@@ -138,3 +138,9 @@ int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset
     read_sector_data(base, buffer);
     return 0;
 }
+
+int read_partition(partition_t *p, uint32_t sector, void *buf)
+{
+    if (sector >= p->count) return -1;
+    return ata_read_28bit_pio(buf, p->drive, p->start + sector);
+}

@@ -1,3 +1,3 @@
 #pragma once
 
-void init_fs();
+void do_mount_root();
