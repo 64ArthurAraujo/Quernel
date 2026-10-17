@@ -14,13 +14,13 @@ int memcmp(const void *__s1, const void *__s2, int __n)
     return 0;
 }
 
-void memcpy(char *dest, char *source, int nbytes)
+void memcpy(char *dest, char *src, int n)
 {
     int i;
 
-    for (i = 0; i < nbytes; i++)
+    for (i = 0; i < n; i++)
     {
-        *(dest + i) = *(source + i);
+        *(dest + i) = *(src + i);
     }
 }
 
