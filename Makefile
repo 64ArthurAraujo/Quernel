@@ -26,6 +26,10 @@ quernel.iso: kernel.elf
 run: quernel.iso
 	qemu-system-i386 -drive format=raw,file=quernel.iso,index=0,media=disk
 
+iso: quernel.iso
+
+build: kernel.elf
+
 %.o: %.c $(HEADERS)
 	@echo "  CC      $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
