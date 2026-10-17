@@ -31,6 +31,28 @@ void memset(void *dest, uint8_t val, uint32_t len)
         *temp++ = val;
 }
 
+void *memmove(void *dest, const void *src, uint32_t n)
+{
+    uint8_t *d = (uint8_t *)dest;
+    const uint8_t *s = (const uint8_t *)src;
+
+    if (d == s || n == 0)
+        return dest;
+
+    if (d < s)
+    {
+        for (uint32_t i = 0; i < n; i++)
+            d[i] = s[i];
+    }
+    else
+    {
+        for (uint32_t i = n; i != 0; i--)
+            d[i - 1] = s[i - 1];
+    }
+
+    return dest;
+}
+
 uint32_t free_mem_address = 0x10000;
 
 uint32_t kmalloc(uint32_t size, int align, uint32_t *physical_addr)
