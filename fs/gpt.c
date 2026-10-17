@@ -7,7 +7,7 @@
 /**
  * returns 1 if valid, 0 on error.
  */
-int is_gpt_valid(struct gpt_header *h)
+int is_gpt_valid(const struct gpt_header *h)
 {
     if (memcmp(h->signature, "EFI PART", 8) != 0)
     {

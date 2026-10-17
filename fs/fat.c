@@ -6,7 +6,7 @@
 /**
  * Performs checks and returns 1 if valid, 0 on error.
  */
-int is_bootsect_valid(struct fat12_bpb *b_sec)
+int is_bootsect_valid(const struct fat12_bpb *b_sec)
 {
     if (b_sec->bytes_per_sector != 512)
     {

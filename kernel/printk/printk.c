@@ -126,7 +126,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt_str, va_list args)
                 int copy = read;
                 if (copy > end - str)
                     copy = end - str;
-                memcpy(str, old_fmt, copy);
+                memcpy(str, (char *)old_fmt, copy);
             }
             str += read;
             continue;
