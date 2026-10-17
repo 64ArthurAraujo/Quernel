@@ -2,70 +2,34 @@
 #include "../cpu/ports.h"
 #include "tty.h"
 
-// declare the functions before so we dont get a compiler warning
-int get_cursor_offset();
-void set_cursor_offset(int offset);
-int print_char(char c, int col, int row, char attr);
-int get_offset(int col, int row);
-int get_offset_row(int offset);
-int get_offset_col(int offset);
+int get_offset(int col, int row) { return 2 * (row * MAX_COLS + col); }
+int get_offset_row(int offset) { return offset / (2 * MAX_COLS); }
+int get_offset_col(int offset) { return (offset - (get_offset_row(offset) * 2 * MAX_COLS)) / 2; }
 
-/**
- * Print a message on the specified location
- * If col, row, are negative, we will use the current offset
- */
-void kprint_at(char *message, int col, int row)
+int get_cursor_offset()
 {
-    /* Set cursor if col/row are negative */
-    int offset;
-    if (col >= 0 && row >= 0)
-        offset = get_offset(col, row);
-    else
-    {
-        offset = get_cursor_offset();
-        row = get_offset_row(offset);
-        col = get_offset_col(offset);
-    }
-
-    // Loop through message and print it
-    int i = 0;
-    while (message[i] != 0)
-    {
-        offset = print_char(message[i++], col, row, WHITE_ON_BLACK);
-        // Compute row/col for next iteration
-        row = get_offset_row(offset);
-        col = get_offset_col(offset);
-    }
+    /* Use the VGA ports to get the current cursor position
+     * 1. Ask for high byte of the cursor offset (data 14)
+     * 2. Ask for low byte (data 15)
+     */
+    port_byte_out(REG_SCREEN_CTRL, 14);
+    int offset = port_byte_in(REG_SCREEN_DATA) << 8; /* High byte: << 8 */
+    port_byte_out(REG_SCREEN_CTRL, 15);
+    offset += port_byte_in(REG_SCREEN_DATA);
+    return offset * 2; /* Position * size of character cell */
 }
 
-void kprint(char *message)
+void set_cursor_offset(int offset)
 {
-    kprint_at(message, -1, -1);
+    /* Similar to get_cursor_offset, but instead of reading we write data */
+    offset /= 2;
+    port_byte_out(REG_SCREEN_CTRL, 14);
+    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset >> 8));
+    port_byte_out(REG_SCREEN_CTRL, 15);
+    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset & 0xff));
 }
 
-void kprintln(char *message)
-{
-    kprint(message);
-    kprint("\n");
-}
-
-void kprint_backspace()
-{
-    int offset = get_cursor_offset() - 2;
-    int row = get_offset_row(offset);
-    int col = get_offset_col(offset);
-    print_char(0x08, col, row, WHITE_ON_BLACK);
-}
-
-void klog(char * message, char * domain) {
-    kprint("[ </> ] ");
-
-    kprint(domain);
-    kprint(": ");
-    kprintln(message);
-}
-
-int print_char(char c, int col, int row, char attr)
+int emit_char(char c, int col, int row, char attr)
 {
     unsigned char *vidmem = (unsigned char *)VIDEO_ADDRESS;
     if (!attr)
@@ -105,12 +69,12 @@ int print_char(char c, int col, int row, char attr)
         for (i = 1; i < MAX_ROWS; i++)
         {
             memcpy(
-                (char *) get_offset(0, i - 1) + VIDEO_ADDRESS,
-                (char *) get_offset(0, i) + VIDEO_ADDRESS,
+                (char *)get_offset(0, i - 1) + VIDEO_ADDRESS,
+                (char *)get_offset(0, i) + VIDEO_ADDRESS,
                 MAX_COLS * 2);
         }
 
-        char *last_line = (char *) (get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
+        char *last_line = (char *)(get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
 
         for (i = 0; i < MAX_COLS * 2; i++)
             last_line[i] = 0;
@@ -122,34 +86,44 @@ int print_char(char c, int col, int row, char attr)
     return offset;
 }
 
-int get_cursor_offset()
+void tty_emit(char *message)
 {
-    /* Use the VGA ports to get the current cursor position
-     * 1. Ask for high byte of the cursor offset (data 14)
-     * 2. Ask for low byte (data 15)
-     */
-    port_byte_out(REG_SCREEN_CTRL, 14);
-    int offset = port_byte_in(REG_SCREEN_DATA) << 8; /* High byte: << 8 */
-    port_byte_out(REG_SCREEN_CTRL, 15);
-    offset += port_byte_in(REG_SCREEN_DATA);
-    return offset * 2; /* Position * size of character cell */
+    tty_emit_at(message, -1, -1);
 }
 
-void set_cursor_offset(int offset)
+/**
+ * Show a message on the specified location
+ * If col, row, are negative, we will use the current offset
+ */
+void tty_emit_at(char *message, int col, int row)
 {
-    /* Similar to get_cursor_offset, but instead of reading we write data */
-    offset /= 2;
-    port_byte_out(REG_SCREEN_CTRL, 14);
-    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset >> 8));
-    port_byte_out(REG_SCREEN_CTRL, 15);
-    port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset & 0xff));
+    /* Set cursor if col/row are negative */
+    int offset;
+    if (col >= 0 && row >= 0)
+        offset = get_offset(col, row);
+    else
+    {
+        offset = get_cursor_offset();
+        row = get_offset_row(offset);
+        col = get_offset_col(offset);
+    }
+
+    // Loop through message and print it
+    int i = 0;
+    while (message[i] != 0)
+    {
+        offset = emit_char(message[i++], col, row, WHITE_ON_BLACK);
+        // Compute row/col for next iteration
+        row = get_offset_row(offset);
+        col = get_offset_col(offset);
+    }
 }
 
-void clear_screen()
+void tty_clear()
 {
     int screen_size = MAX_COLS * MAX_ROWS;
     int i;
-    char *screen = (char *) VIDEO_ADDRESS;
+    char *screen = (char *)VIDEO_ADDRESS;
 
     for (i = 0; i < screen_size; i++)
     {
@@ -158,10 +132,6 @@ void clear_screen()
     }
     set_cursor_offset(get_offset(0, 0));
 }
-
-int get_offset(int col, int row) { return 2 * (row * MAX_COLS + col); }
-int get_offset_row(int offset) { return offset / (2 * MAX_COLS); }
-int get_offset_col(int offset) { return (offset - (get_offset_row(offset) * 2 * MAX_COLS)) / 2; }
 
 static void delay(volatile uint32_t count)
 {
@@ -175,19 +145,21 @@ void hexdump(const uint8_t *buf, int len)
 {
     char line[80];
 
-    for (int i = 0; i < len; i += 16) {
+    for (int i = 0; i < len; i += 16)
+    {
         int p = 0;
 
         /* offset: 4 hex digits */
         line[p++] = hexdigits[(i >> 12) & 0xF];
-        line[p++] = hexdigits[(i >> 8)  & 0xF];
-        line[p++] = hexdigits[(i >> 4)  & 0xF];
+        line[p++] = hexdigits[(i >> 8) & 0xF];
+        line[p++] = hexdigits[(i >> 4) & 0xF];
         line[p++] = hexdigits[i & 0xF];
         line[p++] = ':';
         line[p++] = ' ';
 
         /* 16 bytes as hex */
-        for (int j = 0; j < 16; j++) {
+        for (int j = 0; j < 16; j++)
+        {
             uint8_t b = buf[i + j];
             line[p++] = hexdigits[b >> 4];
             line[p++] = hexdigits[b & 0xF];
@@ -196,15 +168,16 @@ void hexdump(const uint8_t *buf, int len)
 
         /* ASCII column */
         line[p++] = '|';
-        for (int j = 0; j < 16; j++) {
+        for (int j = 0; j < 16; j++)
+        {
             uint8_t c = buf[i + j];
             line[p++] = (c >= 32 && c < 127) ? c : '.';
         }
         line[p++] = '|';
         line[p++] = '\n';
-        line[p]   = '\0';
+        line[p] = '\0';
 
-        kprint(line);
+        tty_emit_at(line, -1, -1);
         delay(20000000);
     }
 }

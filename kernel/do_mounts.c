@@ -16,14 +16,18 @@ void kprint_partition(partition_t *part, int i)
     u32_to_str(part->start, start);
     u32_to_str(part->count, count);
 
-    kprint("Partition ");
-    kprintln(i_str);
 
-    kprint("Start at ");
-    kprintln(start);
-    kprint("Size of ");
-    kprintln(count);
-    kprintln("");
+    // TODO: ugly
+    tty_emit("Partition ");
+    tty_emit(i_str);
+    tty_emit("\n");
+
+    tty_emit("Start at ");
+    tty_emit(start);
+    tty_emit("\n");
+    tty_emit("Size of ");
+    tty_emit(count);
+    tty_emit("\n\n");
 }
 
 void do_mount_root()

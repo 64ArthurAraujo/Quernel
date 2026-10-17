@@ -12,9 +12,7 @@
 #define REG_SCREEN_DATA 0x3d5
 
 /* Public kernel API */
-void clear_screen();
-void kprint_at(char *message, int col, int row);
-void kprint(char *message);
-void kprintln(char *message);
-void klog(char *message, char *domain);
+void tty_clear();
+void tty_emit(char *message);
+void tty_emit_at(char *message, int col, int row);
 void hexdump(const uint8_t *buf, int len);

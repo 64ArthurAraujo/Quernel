@@ -211,7 +211,7 @@ int vprintk(const char *fmt, va_list args)
     /* fill message */
     text_len = printk_sprint(&text_buf[0], reserve_size, fmt, args);
 
-    kprint(text_buf);
+    tty_emit(text_buf);
 }
 
 int printk(const char *fmt, ...)
