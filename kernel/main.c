@@ -7,6 +7,7 @@
 #include "../cpu/ports.h"
 #include "../drivers/ata.h"
 #include "do_mounts.h"
+#include "printk/printk.h"
 #include <stdint.h>
 
 void init_kernel()
@@ -19,7 +20,7 @@ void init_kernel()
 
     init_keyboard();
 
-    kprintln("Quernel version 0.0.0.i686");
+    printk("Quernel version 0.0.0.i686\n");
 
     cpuid_detect();
     ata_detect_drives();

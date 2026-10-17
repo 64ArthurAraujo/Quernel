@@ -4,8 +4,8 @@ CFLAGS = -g -m32 -ffreestanding
 
 ISO_DIR = iso/boot/grub
 
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c fs/*.c)
-HEADERS   = $(wildcard */*.h)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c fs/*.c kernel/printk/*.c)
+HEADERS   = $(wildcard */*.h */*/*.h)
 OBJ       = $(C_SOURCES:.c=.o) cpu/interrupt.o
 
 debug: quernel.iso kernel.elf
