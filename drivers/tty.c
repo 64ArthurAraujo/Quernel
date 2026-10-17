@@ -105,8 +105,8 @@ int print_char(char c, int col, int row, char attr)
         for (i = 1; i < MAX_ROWS; i++)
         {
             memcpy(
-                (char *) get_offset(0, i) + VIDEO_ADDRESS,
                 (char *) get_offset(0, i - 1) + VIDEO_ADDRESS,
+                (char *) get_offset(0, i) + VIDEO_ADDRESS,
                 MAX_COLS * 2);
         }
 

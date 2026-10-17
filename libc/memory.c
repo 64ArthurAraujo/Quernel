@@ -14,7 +14,7 @@ int memcmp(const void *__s1, const void *__s2, int __n)
     return 0;
 }
 
-void memcpy(char *source, char *dest, int nbytes)
+void memcpy(char *dest, char *source, int nbytes)
 {
     int i;
 
