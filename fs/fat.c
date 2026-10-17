@@ -1,5 +1,6 @@
 #include "../drivers/ata.h"
 #include "../drivers/tty.h"
+#include "../kernel/printk/printk.h"
 #include "fat.h"
 
 /**
@@ -9,13 +10,13 @@ int is_bootsect_valid(struct fat12_bpb *b_sec)
 {
     if (b_sec->bytes_per_sector != 512)
     {
-        kprintln("Invalid size of bytes per sector, not 512!");
+        printk("Invalid size of bytes per sector, not 512!\n");
         return 0;
     }
 
     if (b_sec->sectors_per_cluster == 0 || (b_sec->sectors_per_cluster & (b_sec->sectors_per_cluster - 1)))
     {
-        kprint("Invalid number of sectors per cluster!");
+        printk("Invalid number of sectors per cluster!\n");
         return 0;
     }
 
@@ -33,7 +34,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (read_partition(part, 0, sec) != 0)
     {
-        kprintln("fat12_mount: Failed to read partition!");
+        printk("Failed to read partition!\n");
         return -1;
     }
 
@@ -44,7 +45,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (is_bootsect_valid(b) == 0)
     {
-        kprintln("fat12_mount: Failed to validate the boot sector!");
+        printk("Failed to validate the boot sector!\n");
         return -3;
     }
 
@@ -59,7 +60,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (total <= fs->data_start)
     {
-        kprintln("fat12_mount: Total of sectors is less or equal to the data_start!");
+        printk("Total of sectors is less or equal to the data_start!\n");
         return -3;
     }
 
@@ -67,7 +68,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (fs->cluster_count >= 4085)
     {
-        kprintln("fat12_mount: cluster count exceeds 4085, this partition is likely not a FAT12 partition!");
+        printk("Cluster count exceeds 4085, this partition is likely not a FAT12 partition!\n");
         return -5;
     }
 
@@ -76,7 +77,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
         // Load the data into fs->fat
         if (read_partition(part, fs->fat_start + i, fs->fat + i * 512) != 0)
         {
-            kprintln("fat12_mount: Failed to read filesys data!");
+            printk("Failed to read filesys data!\n");
             return -1;
         }
     }

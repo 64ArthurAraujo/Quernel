@@ -1,6 +1,7 @@
 #include "../cpu/ports.h"
 #include "../libc/memory.h"
 #include "../libc/string.h"
+#include "../kernel/printk/printk.h"
 #include "ata.h"
 #include "tty.h"
 
@@ -48,7 +49,7 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive)
 
     if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
-        kprintln("ata_identify: failed to identify disk! Error or drive fault");
+        printk("Failed to identify disk!\n");
         return 0;
     }
 
@@ -94,7 +95,7 @@ void ata_detect_drives()
     }
 
     if (!found)
-        kprintln("ATA unable to detect any devices");
+        printk("ATA: Not a single device was detected\n");
 }
 
 
@@ -125,13 +126,13 @@ int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset
 
     if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
-        kprintln("ata_read_28bit_pio: failed to read sectors! Error or drive fault");
+        printk("28bit pio failed to read sectors!\n");
         return -1;
     }
 
     if (!(status & ATA_SR_DRQ))
     {
-        kprintln("ata_read_28bit_pio: failed to read sectors! No DRQ");
+        printk("28bit pio failed to read sectors! No DRQ\n");
         return -1;
     }
 

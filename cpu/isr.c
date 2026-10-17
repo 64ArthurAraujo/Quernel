@@ -1,6 +1,7 @@
 #include "../drivers/tty.h"
 #include "../cpu/ports.h"
 #include "../libc/string.h"
+#include "../kernel/printk/printk.h"
 #include "isr.h"
 #include "idt.h"
 #include <stdint.h>
@@ -136,15 +137,9 @@ char *exception_messages[] = {
 
 void isr_handler(registers_t r)
 {
-    // for some reason if the string is not this big it causes a disk read error in qemu (??????)
-    kprintln("Received interrupt||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
     char s[3];
     int_to_ascii(r.int_no, s);
-    kprint(s);
-    kprint("\n");
-    kprint(exception_messages[r.int_no]);
-    kprint("\n");
+    printk("ISR: %s message = %s\n", s, exception_messages[r.int_no]);
 }
 
 void register_interrupt_handler(uint8_t n, isr_t handler)

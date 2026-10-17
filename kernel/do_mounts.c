@@ -3,6 +3,7 @@
 #include "../fs/gpt.h"
 #include "../fs/fat.h"
 #include "../drivers/tty.h"
+#include "../kernel/printk/printk.h"
 #include <stdint.h>
 
 void kprint_partition(partition_t *part, int i)
@@ -36,15 +37,14 @@ void do_mount_root()
     {
         if (drives[drive_i].present == 1)
         {
-            kprint("ATA: ");
-            kprintln((char *)drives[drive_i].model);
+            printk("ATA: %s\n", (char *)drives[drive_i].model);
 
             gpt_part_t gp[8];
             int r = gpt_read(&drives[drive_i], gp, 8);
 
             if (r < 0)
             {
-                kprintln("GPT read failed!");
+                printk("GPT read failed!");
                 return;
             }
 
@@ -63,7 +63,7 @@ void do_mount_root()
 
                 if (res == 0) 
                 {
-                    kprintln("Mounted fat12 filesys!");
+                    printk("Mounted fat12 filesys!\n");
                 }
             }
         }

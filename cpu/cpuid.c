@@ -1,5 +1,6 @@
 #include "../drivers/tty.h"
 #include "../libc/memory.h"
+#include "../kernel/printk/printk.h"
 #include "cpuid.h"
 #include <stdint.h>
 
@@ -33,7 +34,7 @@ void cpuid_detect()
 {
     if (!cpuid_supported())
     {
-        kprintln("CPUID is not supported");
+        printk("CPUID is not supported\n");
         return;
     }
 
@@ -67,8 +68,5 @@ void cpuid_detect()
         cpu_info.brand[48] = '\0';
     }
 
-    kprint("CPU: ");
-    kprint(cpu_info.vendor);
-    kprint(" ");
-    kprintln(cpu_info.brand);
+    printk("CPU: %s %s\n", cpu_info.vendor, cpu_info.brand);
 }

@@ -2,6 +2,7 @@
 #include "../drivers/ata.h"
 #include "../drivers/tty.h"
 #include "../libc/memory.h"
+#include "../kernel/printk/printk.h"
 
 /**
  * returns 1 if valid, 0 on error.
@@ -10,13 +11,13 @@ int is_gpt_valid(struct gpt_header *h)
 {
     if (memcmp(h->signature, "EFI PART", 8) != 0)
     {
-        kprintln("GPT Partition table signature is wrong!");
+        printk("GPT Partition table signature is wrong!\n");
         return 0;
     }
 
     if (h->entry_size != 128 || h->entries_lba > 0x0FFFFFFF)
     {
-        kprintln("gpt_read: Partition table header size is too large!");
+        printk("Partition table header size is too large!\n");
         return 0;
     }
 
