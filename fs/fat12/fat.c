@@ -1,4 +1,4 @@
-#include "../../libc/string.h"
+#include <string.h>
 #include <quernel/printk.h>
 #include <drivers/ata.h>
 #include "fat.h"

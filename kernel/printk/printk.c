@@ -1,4 +1,4 @@
-#include "../../libc/memory.h"
+#include <memory.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>

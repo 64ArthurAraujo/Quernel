@@ -1,6 +1,6 @@
 #include "../cpu/ports.h"
-#include "../libc/memory.h"
-#include "../libc/string.h"
+#include <memory.h>
+#include <string.h>
 #include "ata.h"
 #include <quernel/printk.h>
 #include <drivers/tty.h>

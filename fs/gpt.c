@@ -1,5 +1,5 @@
 #include "./gpt.h"
-#include "../libc/memory.h"
+#include <memory.h>
 #include <quernel/printk.h>
 #include <quernel/macros.h>
 #include <drivers/tty.h>

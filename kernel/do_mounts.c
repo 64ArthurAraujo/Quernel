@@ -1,4 +1,4 @@
-#include "../libc/string.h"
+#include <string.h>
 #include "../fs/gpt.h"
 #include "../fs/fat12/fat.h"
 #include <quernel/printk.h>

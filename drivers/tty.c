@@ -1,4 +1,4 @@
-#include "../libc/memory.h"
+#include <memory.h>
 #include "../cpu/ports.h"
 #include "tty.h"
 

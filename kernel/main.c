@@ -1,6 +1,6 @@
 #include "../cpu/isr.h"
 #include "../cpu/timer.h"
-#include "../libc/memory.h"
+#include <memory.h>
 #include "../cpu/cpuid.h"
 #include "../cpu/ports.h"
 #include "do_mounts.h"

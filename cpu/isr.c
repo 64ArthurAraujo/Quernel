@@ -1,6 +1,6 @@
 #include "../drivers/tty.h"
 #include "../cpu/ports.h"
-#include "../libc/string.h"
+#include <string.h>
 #include "isr.h"
 #include "idt.h"
 #include <stdint.h>
