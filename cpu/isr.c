@@ -1,4 +1,3 @@
-#include "../drivers/tty.h"
 #include "ports.h"
 #include <string.h>
 #include "isr.h"
