@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "../../drivers/ata.h"
+#include <drivers/ata.h>
 #include <quernel/macros.h>
 
 #define FAT12_MAX_FAT_SECTORS 16

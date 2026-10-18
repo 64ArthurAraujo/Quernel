@@ -1,12 +1,11 @@
-#include "../drivers/tty.h"
 #include "../cpu/isr.h"
 #include "../cpu/timer.h"
 #include "../libc/memory.h"
 #include "../cpu/cpuid.h"
 #include "../cpu/ports.h"
-#include "../drivers/ata.h"
 #include "do_mounts.h"
 #include <quernel/printk.h>
+#include <drivers/ata.h>
 #include <stdint.h>
 
 void init_kernel()

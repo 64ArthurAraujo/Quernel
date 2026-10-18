@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <drivers/ata.h>
 
 #define ATA_PRIMARY_BASE     0x1F0
 #define ATA_SECONDARY_BASE   0x170
@@ -27,23 +28,3 @@
 #define ATA_CMD_IDENTIFY     0xEC
 #define ATA_CMD_READSECTORS  0x20
 
-typedef struct {
-    uint8_t  present;
-    uint8_t  is_master;
-    uint8_t  slave;
-    uint16_t base;
-    char     model[41];
-    uint32_t sectors;
-} ata_drive_t;
-
-typedef struct {
-    ata_drive_t *drive;
-    uint32_t     start;
-    uint32_t     count;  
-} partition_t;
-
-static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive);
-void ata_detect_drives();
-ata_drive_t* get_ata_drives();
-int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset);
-int read_partition(partition_t *p, uint32_t sector, void *buf);

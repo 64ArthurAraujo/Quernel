@@ -1,6 +1,6 @@
-#include "../../drivers/ata.h"
 #include "../../libc/string.h"
 #include <quernel/printk.h>
+#include <drivers/ata.h>
 #include "fat.h"
 
 /**
