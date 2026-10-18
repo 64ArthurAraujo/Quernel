@@ -8,10 +8,6 @@
             ],
             "defines": [],
             "compilerPath": "/home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-gcc",
-            "compilerArgs": [
-                "-ffreestanding",
-                "-nostdinc"
-            ],
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-gcc-x64",
