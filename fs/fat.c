@@ -4,10 +4,6 @@
 #include "../libc/string.h"
 #include "fat.h"
 
-#define FAT12_VALID(c) ((c) >= 2 && (c) <= 0xFEF)
-
-typedef int (*fat12_dir_cb)(const struct fat_dirent *e, void *ctx);
-
 /**
  * Performs checks and returns 1 if valid, 0 on error.
  */
@@ -241,4 +237,97 @@ static int print_entry(const struct fat_dirent *e, void *ctx)
 void fat12_ls(fat12_t *fs, uint16_t dir_cluster)
 {
     fat12_walk_dir(fs, dir_cluster, print_entry, 0);
+}
+
+static int find_cb(const struct fat_dirent *e, void *ctx)
+{
+    struct find_ctx *f = ctx;
+
+    for (int i = 0; i < 11; i++)
+        if (e->name[i] != f->name[i])
+            return 0;
+
+    f->found = *e;
+    f->ok = 1;
+
+    return 1;
+}
+
+int fat12_lookup(fat12_t *fs, const char *path, struct fat_dirent *out)
+{
+    uint16_t dir = 0;
+    struct find_ctx fc;
+
+    while (*path == '/')
+        path++;
+
+    if (!*path)
+        return -1;
+
+    for (;;)
+    {
+        char comp[16];
+        int n = 0;
+
+        while (*path && *path != '/')
+        {
+            if (n >= 15)
+                return -1;
+            comp[n++] = *path++;
+        }
+        comp[n] = '\0';
+        while (*path == '/')
+            path++;
+
+        if (fat12_make_83(comp, fc.name) != 0)
+            return -1;
+
+        fc.ok = 0;
+
+        if (fat12_walk_dir(fs, dir, find_cb, &fc) < 0 || !fc.ok)
+            return -1;
+
+        if (!*path)
+        {
+            /* last component */
+            *out = fc.found;
+            return 0;
+        }
+
+        /* not a directory */
+        if (!(fc.found.attr & ATTR_DIR))
+            return -1;
+
+        dir = fc.found.cluster_lo;
+    }
+}
+
+int32_t fat12_read(fat12_t *fs, const struct fat_dirent *e, void *dst, uint32_t max)
+{
+    uint8_t sec[512] __attribute__((aligned(2)));
+    uint8_t *out = dst;
+    uint32_t remaining = e->size < max ? e->size : max;
+    uint32_t total = 0;
+    uint16_t c = e->cluster_lo;
+    uint32_t guard = fs->cluster_count + 2;
+
+    while (remaining > 0 && FAT12_VALID(c) && guard--)
+    {
+        uint32_t base = cluster_to_sector(fs, c);
+        for (uint32_t s = 0; s < fs->sectors_per_cluster && remaining > 0; s++)
+        {
+            if (read_partition(fs->part, base + s, sec) != 0)
+                return -1;
+
+            uint32_t n = remaining < 512 ? remaining : 512;
+
+            for (uint32_t i = 0; i < n; i++)
+                out[total + i] = sec[i];
+
+            total += n;
+            remaining -= n;
+        }
+        c = fat12_next(fs, c);
+    }
+    return (int32_t)total;
 }
