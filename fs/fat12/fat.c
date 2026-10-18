@@ -31,11 +31,7 @@ int is_bootsect_valid(const struct fat12_bpb *b_sec)
  */
 int fat12_mount(fat12_t *fs, partition_t *part)
 {
-<<<<<<< HEAD
-    uint8_t sec[512] __attribute__((aligned(2)));
-=======
     uint8_t sec[512] __aligned(2);
->>>>>>> 57d2674 ((#5) Add macros for compiler attributes)
 
     if (read_partition(part, 0, sec) != 0)
     {

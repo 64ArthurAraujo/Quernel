@@ -1,10 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "../../drivers/ata.h"
-<<<<<<< HEAD
-=======
 #include "../../kernel/macros.h"
->>>>>>> 57d2674 ((#5) Add macros for compiler attributes)
 
 #define FAT12_MAX_FAT_SECTORS 16
 
