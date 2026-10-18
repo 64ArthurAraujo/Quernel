@@ -47,6 +47,10 @@ void do_mount_root()
             {
                 printk("Mounted FAT12 file system!\n");
                 is_fat12_mounted = 1;
+
+                struct fat_dirent dirent;
+                fat12_lookup(&fat12_fs, "/EFI/BOOT/BOOTX64.EFI", &dirent);
+
                 continue;
             }
 
