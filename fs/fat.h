@@ -57,4 +57,9 @@ typedef struct {
     uint8_t  fat[FAT12_MAX_FAT_SECTORS * 512] __attribute__((aligned(2)));
 } fat12_t; 
 
+#define ATTR_VOLUME 0x08
+#define ATTR_DIR    0x10
+#define ATTR_LFN    0x0F
+
 int fat12_mount(fat12_t *fs, partition_t *part);
+void fat12_ls(fat12_t *fs, uint16_t dir_cluster);

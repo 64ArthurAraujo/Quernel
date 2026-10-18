@@ -1,7 +1,12 @@
 #include "../drivers/ata.h"
 #include "../drivers/tty.h"
 #include "../kernel/printk/printk.h"
+#include "../libc/string.h"
 #include "fat.h"
+
+#define FAT12_VALID(c) ((c) >= 2 && (c) <= 0xFEF)
+
+typedef int (*fat12_dir_cb)(const struct fat_dirent *e, void *ctx);
 
 /**
  * Performs checks and returns 1 if valid, 0 on error.
@@ -83,4 +88,157 @@ int fat12_mount(fat12_t *fs, partition_t *part)
     }
 
     return 0;
+}
+
+static uint16_t fat12_next(const fat12_t *fs, uint16_t c)
+{
+    uint32_t off = c + (c / 2);
+    uint16_t v = fs->fat[off] | (fs->fat[off + 1] << 8);
+    return (c & 1) ? (v >> 4) : (v & 0x0FFF);
+}
+
+static uint32_t cluster_to_sector(const fat12_t *fs, uint16_t c)
+{
+    return fs->data_start + (uint32_t)(c - 2) * fs->sectors_per_cluster;
+}
+
+static int scan_sector(const uint8_t *sec, fat12_dir_cb cb, void *ctx)
+{
+    for (int i = 0; i < 16; i++)
+    {
+        const struct fat_dirent *e = (const struct fat_dirent *)(sec + i * 32);
+        uint8_t first = (uint8_t)e->name[0];
+
+        if (first == 0x00)
+            return 2; /* no more entries */
+        if (first == 0xE5)
+            continue; /* deleted */
+        if (e->attr == ATTR_LFN)
+            continue; /* long-name fragment */
+        if (e->attr & ATTR_VOLUME)
+            continue; /* volume label */
+        if (cb(e, ctx))
+            return 1;
+    }
+    return 0;
+}
+
+int fat12_walk_dir(fat12_t *fs, uint16_t dir_cluster, fat12_dir_cb cb, void *ctx)
+{
+    uint8_t sec[512] __attribute__((aligned(2)));
+    int r;
+
+    if (dir_cluster == 0)
+    {
+        for (uint32_t s = 0; s < fs->root_sectors; s++)
+        {
+            if (read_partition(fs->part, fs->root_start + s, sec) != 0)
+                return -1;
+            r = scan_sector(sec, cb, ctx);
+
+            if (r == 1)
+                return 1;
+            if (r == 2)
+                return 0;
+        }
+
+        return 0;
+    }
+
+    uint16_t c = dir_cluster;
+    uint32_t guard = fs->cluster_count + 2;
+
+    while (FAT12_VALID(c) && guard--)
+    {
+        uint32_t base = cluster_to_sector(fs, c);
+
+        for (uint32_t s = 0; s < fs->sectors_per_cluster; s++)
+        {
+            if (read_partition(fs->part, base + s, sec) != 0)
+                return -1;
+            r = scan_sector(sec, cb, ctx);
+
+            if (r == 1)
+                return 1;
+            if (r == 2)
+                return 0;
+        }
+
+        c = fat12_next(fs, c);
+    }
+
+    return 0;
+}
+
+static char upper(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
+
+static void fat12_format_name(const struct fat_dirent *e, char *out)
+{
+    int p = 0;
+
+    for (int i = 0; i < 8 && e->name[i] != ' '; i++)
+        out[p++] = e->name[i];
+
+    if (e->name[8] != ' ')
+    {
+        out[p++] = '.';
+        for (int i = 8; i < 11 && e->name[i] != ' '; i++)
+            out[p++] = e->name[i];
+    }
+
+    out[p] = '\0';
+}
+
+static int fat12_make_83(const char *s, char out[11])
+{
+    int n = 0;
+    for (int i = 0; i < 11; i++)
+        out[i] = ' ';
+
+    for (; *s && *s != '.'; s++)
+    {
+        if (n >= 8)
+            return -1;
+        out[n++] = upper(*s);
+    }
+
+    if (*s == '.')
+    {
+        s++;
+        n = 8;
+
+        for (; *s; s++)
+        {
+            if (n >= 11)
+                return -1;
+            out[n++] = upper(*s);
+        }
+    }
+
+    return 0;
+}
+
+static int print_entry(const struct fat_dirent *e, void *ctx)
+{
+    (void)ctx;
+    char name[13], num[11];
+
+    fat12_format_name(e, name);
+    printk("%s", name);
+
+    if (e->attr & ATTR_DIR)
+    {
+        printk("  <DIR>\n");
+    }
+    else
+    {
+        u32_to_str(e->size, num);
+        printk("  %s bytes\n", num);
+    }
+    return 0;
+}
+
+void fat12_ls(fat12_t *fs, uint16_t dir_cluster)
+{
+    fat12_walk_dir(fs, dir_cluster, print_entry, 0);
 }

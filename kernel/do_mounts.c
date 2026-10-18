@@ -6,30 +6,6 @@
 #include "../kernel/printk/printk.h"
 #include <stdint.h>
 
-void kprint_partition(partition_t *part, int i)
-{
-    char i_str[12];
-    char start[12];
-    char count[12];
-
-    int_to_ascii(i, i_str);
-    u32_to_str(part->start, start);
-    u32_to_str(part->count, count);
-
-
-    // TODO: ugly
-    tty_emit("Partition ");
-    tty_emit(i_str);
-    tty_emit("\n");
-
-    tty_emit("Start at ");
-    tty_emit(start);
-    tty_emit("\n");
-    tty_emit("Size of ");
-    tty_emit(count);
-    tty_emit("\n\n");
-}
-
 void do_mount_root()
 {
     ata_drive_t *drives = get_ata_drives();
@@ -59,15 +35,15 @@ void do_mount_root()
                 part->drive = &drives[drive_i];
                 part->start = gp[i].start;
                 part->count = gp[i].count;
-
-                kprint_partition(part, i);
-                
                 
                 int res = fat12_mount(&fat12_fs, part);   
 
                 if (res == 0) 
                 {
-                    printk("Mounted fat12 filesys!\n");
+                    printk("Doing an LS in the found FAT12 partition\n");
+                    fat12_ls(&fat12_fs, 0);
+
+                    break; // we found the first mountable partition, so leave for now
                 }
             }
         }
