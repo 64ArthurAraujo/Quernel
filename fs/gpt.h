@@ -2,13 +2,7 @@
 #include <stdint.h>
 #include <drivers/ata.h>
 #include <quernel/macros.h>
-
-typedef struct
-{
-    uint32_t start;
-    uint32_t count;
-    uint8_t type_guid[16];
-} gpt_part_t;
+#include <fs/gpt.h>
 
 struct __packed gpt_header
 {
@@ -38,5 +32,3 @@ struct __packed gpt_entry {
     uint16_t name[36];          
 };
 _Static_assert(sizeof(struct gpt_entry) == 128, "gpt entry size");
-
-int gpt_read(ata_drive_t *drive, gpt_part_t *out, int max);

@@ -1,9 +1,9 @@
-#include <string.h>
-#include "../fs/gpt.h"
-#include "../fs/fat12/fat.h"
 #include <quernel/printk.h>
 #include <drivers/tty.h>
 #include <drivers/ata.h>
+#include <fs/fat12.h>
+#include <fs/gpt.h>
+#include <string.h>
 #include <stdint.h>
 
 void do_mount_root()
