@@ -1,12 +1,10 @@
-#include "../cpu/isr.h"
-#include "../cpu/timer.h"
-#include <memory.h>
-#include "../cpu/cpuid.h"
-#include "../cpu/ports.h"
-#include "do_mounts.h"
 #include <quernel/printk.h>
+#include <quernel/cpu.h>
 #include <drivers/ata.h>
 #include <stdint.h>
+#include <memory.h>
+
+#include "do_mounts.h"
 
 void init_kernel()
 {

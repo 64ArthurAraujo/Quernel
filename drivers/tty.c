@@ -1,5 +1,5 @@
 #include <memory.h>
-#include "../cpu/ports.h"
+#include <quernel/cpu.h>
 #include "tty.h"
 
 int get_offset(int col, int row) { return 2 * (row * MAX_COLS + col); }

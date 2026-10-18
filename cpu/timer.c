@@ -1,6 +1,6 @@
 #include "timer.h"
 #include "isr.h"
-#include "../cpu/ports.h"
+#include "ports.h"
 #include <string.h>
 #include <stdint.h>
 #include <drivers/tty.h>
