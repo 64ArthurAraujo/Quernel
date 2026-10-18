@@ -3,7 +3,7 @@
 #include "../fs/gpt.h"
 #include "../fs/fat12/fat.h"
 #include <quernel/printk.h>
-#include <tty.h>
+#include <drivers/tty.h>
 #include <stdint.h>
 
 void do_mount_root()

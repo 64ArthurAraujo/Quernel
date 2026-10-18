@@ -3,7 +3,7 @@
 #include "../libc/string.h"
 #include "ata.h"
 #include <quernel/printk.h>
-#include <tty.h>
+#include <drivers/tty.h>
 
 ata_drive_t ata_drives[4];
 

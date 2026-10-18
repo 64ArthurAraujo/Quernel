@@ -3,7 +3,7 @@
 #include "../libc/memory.h"
 #include <quernel/printk.h>
 #include <quernel/macros.h>
-#include <tty.h>
+#include <drivers/tty.h>
 
 /**
  * returns 1 if valid, 0 on error.

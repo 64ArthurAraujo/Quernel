@@ -3,7 +3,7 @@
 #include "../cpu/ports.h"
 #include "../libc/string.h"
 #include <stdint.h>
-#include <tty.h>
+#include <drivers/tty.h>
 
 uint32_t tick = 0;
 

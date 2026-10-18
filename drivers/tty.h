@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <tty.h>
+#include <drivers/tty.h>
 
 #define VIDEO_ADDRESS 0xb8000
 #define MAX_ROWS 25

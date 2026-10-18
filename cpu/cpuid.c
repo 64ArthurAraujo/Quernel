@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <tty.h>
+#include <drivers/tty.h>
 #include <quernel/printk.h>
 #include "../libc/memory.h"
 #include "cpuid.h"
