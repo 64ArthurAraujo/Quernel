@@ -1,10 +1,10 @@
 #include "../drivers/tty.h"
 #include "../cpu/ports.h"
 #include "../libc/string.h"
-#include "../kernel/printk/printk.h"
 #include "isr.h"
 #include "idt.h"
 #include <stdint.h>
+#include <quernel/printk.h>
 
 isr_t interrupt_handlers[256];
 

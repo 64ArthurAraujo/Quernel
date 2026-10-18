@@ -1,9 +1,9 @@
 #include "timer.h"
 #include "isr.h"
-#include "../drivers/tty.h"
 #include "../cpu/ports.h"
 #include "../libc/string.h"
 #include <stdint.h>
+#include <tty.h>
 
 uint32_t tick = 0;
 

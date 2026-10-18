@@ -1,9 +1,9 @@
 #include "./gpt.h"
 #include "../drivers/ata.h"
-#include "../drivers/tty.h"
 #include "../libc/memory.h"
-#include "../kernel/printk/printk.h"
-#include "../kernel/macros.h"
+#include <quernel/printk.h>
+#include <quernel/macros.h>
+#include <tty.h>
 
 /**
  * returns 1 if valid, 0 on error.

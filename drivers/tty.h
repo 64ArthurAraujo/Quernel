@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <tty.h>
 
 #define VIDEO_ADDRESS 0xb8000
 #define MAX_ROWS 25
@@ -10,9 +11,3 @@
 /* Screen i/o ports */
 #define REG_SCREEN_CTRL 0x3d4
 #define REG_SCREEN_DATA 0x3d5
-
-/* Public kernel API */
-void tty_clear();
-void tty_emit(char *message);
-void tty_emit_at(char *message, int col, int row);
-void hexdump(const uint8_t *buf, int len);

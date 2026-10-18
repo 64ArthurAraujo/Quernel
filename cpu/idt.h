@@ -4,7 +4,7 @@
 #define IDT_H
 
 #include <stdint.h>
-#include "../kernel/macros.h"
+#include <quernel/macros.h>
 
 /* Segment selectors */
 #define KERNEL_CS 0x08

@@ -1,8 +1,8 @@
 #include "../../libc/memory.h"
-#include "../../drivers/tty.h"
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <tty.h>
 
 enum format_state
 {

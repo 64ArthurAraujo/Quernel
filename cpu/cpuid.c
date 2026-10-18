@@ -1,8 +1,8 @@
-#include "../drivers/tty.h"
-#include "../libc/memory.h"
-#include "../kernel/printk/printk.h"
-#include "cpuid.h"
 #include <stdint.h>
+#include <tty.h>
+#include <quernel/printk.h>
+#include "../libc/memory.h"
+#include "cpuid.h"
 
 static void cpuid(uint32_t leaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {

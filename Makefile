@@ -1,6 +1,6 @@
 CC  = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-gcc
 LD  = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-ld
-CFLAGS = -g -m32 -ffreestanding
+CFLAGS = -g -m32 -ffreestanding -Iinclude -Ifs
 
 ISO_DIR = iso/boot/grub
 

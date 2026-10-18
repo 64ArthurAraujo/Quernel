@@ -1,9 +1,9 @@
 #include "../cpu/ports.h"
 #include "../libc/memory.h"
 #include "../libc/string.h"
-#include "../kernel/printk/printk.h"
 #include "ata.h"
-#include "tty.h"
+#include <quernel/printk.h>
+#include <tty.h>
 
 ata_drive_t ata_drives[4];
 

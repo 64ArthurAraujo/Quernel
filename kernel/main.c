@@ -6,7 +6,7 @@
 #include "../cpu/ports.h"
 #include "../drivers/ata.h"
 #include "do_mounts.h"
-#include "printk/printk.h"
+#include <quernel/printk.h>
 #include <stdint.h>
 
 void init_kernel()
