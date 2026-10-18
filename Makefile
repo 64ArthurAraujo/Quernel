@@ -1,10 +1,10 @@
 CC  = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-gcc
 LD  = /home/arthur/Downloads/i686-elf-tools-linux/bin/i686-elf-ld
-CFLAGS = -g -m32 -ffreestanding -Iinclude -Ifs
+CFLAGS = -g -m32 -ffreestanding -Iinclude -Wmaybe-uninitialized
 
 ISO_DIR = iso/boot/grub
 
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c fs/*.c kernel/printk/*.c fs/fat12/*.c)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c fs/*.c kernel/printk/*.c fs/*/*.c)
 HEADERS   = $(wildcard */*.h */*/*.h)
 OBJ       = $(C_SOURCES:.c=.o) cpu/interrupt.o
 
