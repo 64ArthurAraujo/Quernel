@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-
 void append(char s[], char n);
 
 void int_to_ascii(int n, char str[])

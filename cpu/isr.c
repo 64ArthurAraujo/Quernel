@@ -1,9 +1,11 @@
-#include "ports.h"
+
+#include <quernel/printk.h>
 #include <string.h>
+#include <stdint.h>
+
+#include "ports.h"
 #include "isr.h"
 #include "idt.h"
-#include <stdint.h>
-#include <quernel/printk.h>
 
 isr_t interrupt_handlers[256];
 

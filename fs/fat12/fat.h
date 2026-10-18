@@ -1,7 +1,7 @@
 #pragma once
-#include <stdint.h>
 #include <drivers/ata.h>
 #include <quernel/macros.h>
+#include <stdint.h>
 #include <fs/fat12.h>
 
 struct __packed fat12_bpb

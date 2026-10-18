@@ -1,6 +1,7 @@
-#include "idt.h"
 #include <memory.h>
 #include <stdint.h>
+
+#include "idt.h"
 
 void set_idt_gate(int n, uint32_t handler)
 {

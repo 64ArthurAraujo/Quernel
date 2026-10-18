@@ -1,9 +1,10 @@
-#include <memory.h>
-#include <string.h>
-#include "ata.h"
 #include <quernel/printk.h>
 #include <quernel/cpu.h>
 #include <drivers/tty.h>
+#include <memory.h>
+#include <string.h>
+
+#include "ata.h"
 
 ata_drive_t ata_drives[4];
 
