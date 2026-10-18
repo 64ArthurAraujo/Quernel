@@ -1,34 +1,10 @@
 #include "../drivers/ata.h"
 #include "../libc/string.h"
 #include "../fs/gpt.h"
-#include "../fs/fat.h"
+#include "../fs/fat12/fat.h"
 #include "../drivers/tty.h"
 #include "../kernel/printk/printk.h"
 #include <stdint.h>
-
-void kprint_partition(partition_t *part, int i)
-{
-    char i_str[12];
-    char start[12];
-    char count[12];
-
-    int_to_ascii(i, i_str);
-    u32_to_str(part->start, start);
-    u32_to_str(part->count, count);
-
-
-    // TODO: ugly
-    tty_emit("Partition ");
-    tty_emit(i_str);
-    tty_emit("\n");
-
-    tty_emit("Start at ");
-    tty_emit(start);
-    tty_emit("\n");
-    tty_emit("Size of ");
-    tty_emit(count);
-    tty_emit("\n\n");
-}
 
 void do_mount_root()
 {
@@ -36,6 +12,7 @@ void do_mount_root()
     static partition_t *part;
 
     static fat12_t fat12_fs;
+    static uint8_t filebuf[4096];
 
     for (int drive_i = 0; drive_i < 4; drive_i++)
     {
@@ -52,7 +29,8 @@ void do_mount_root()
                 return;
             }
 
-            if (r > 8) r = 8;
+            if (r > 8)
+                r = 8;
 
             for (int i = 0; i < r; i++)
             {
@@ -60,14 +38,27 @@ void do_mount_root()
                 part->start = gp[i].start;
                 part->count = gp[i].count;
 
-                kprint_partition(part, i);
-                
-                
-                int res = fat12_mount(&fat12_fs, part);   
+                int res = fat12_mount(&fat12_fs, part);
 
-                if (res == 0) 
+                if (res == 0)
                 {
-                    printk("Mounted fat12 filesys!\n");
+                    printk("Doing an LS in the found FAT12 partition\n");
+                    fat12_ls(&fat12_fs, 0);
+
+                    struct fat_dirent e;
+
+                    if (fat12_lookup(&fat12_fs, "/EFI/BOOT/BOOTX64.EFI", &e) == 0)
+                    {
+                        int32_t n = fat12_read(&fat12_fs, &e, filebuf, sizeof filebuf - 1);
+
+                        if (n >= 0)
+                        {
+                            filebuf[n] = '\0';
+                            hexdump(filebuf, 412);
+                        }
+                    }
+
+                    break; // we found the first mountable partition, so leave for now
                 }
             }
         }

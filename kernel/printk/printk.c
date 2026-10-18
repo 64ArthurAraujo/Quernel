@@ -198,7 +198,7 @@ uint16_t printk_sprint(char *text, size_t size, const char *fmt, va_list args)
 
 int vprintk(const char *fmt, va_list args)
 {
-    char *text_buf;
+    char text_buf[256];
     uint16_t text_len;
     va_list args2;
     uint16_t reserve_size;
@@ -212,6 +212,8 @@ int vprintk(const char *fmt, va_list args)
     text_len = printk_sprint(&text_buf[0], reserve_size, fmt, args);
 
     tty_emit(text_buf);
+
+    return text_len;
 }
 
 int printk(const char *fmt, ...)
