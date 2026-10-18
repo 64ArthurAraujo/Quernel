@@ -1,7 +1,7 @@
 #include "../drivers/ata.h"
 #include "../libc/string.h"
 #include "../fs/gpt.h"
-#include "../fs/fat.h"
+#include "../fs/fat12/fat.h"
 #include "../drivers/tty.h"
 #include "../kernel/printk/printk.h"
 #include <stdint.h>
