@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "../drivers/ata.h"
+#include "../kernel/macros.h"
 
 typedef struct
 {
@@ -9,7 +10,7 @@ typedef struct
     uint8_t type_guid[16];
 } gpt_part_t;
 
-struct __attribute__((packed)) gpt_header
+struct __packed gpt_header
 {
     char signature[8];
     uint32_t revision;
@@ -28,7 +29,7 @@ struct __attribute__((packed)) gpt_header
 };
 _Static_assert(sizeof(struct gpt_header) == 92, "gpt header size");
 
-struct __attribute__((packed)) gpt_entry {
+struct __packed gpt_entry {
     uint8_t  type_guid[16];      
     uint8_t  part_guid[16];
     uint64_t first_lba;

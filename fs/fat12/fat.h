@@ -1,10 +1,14 @@
 #pragma once
 #include <stdint.h>
 #include "../../drivers/ata.h"
+<<<<<<< HEAD
+=======
+#include "../../kernel/macros.h"
+>>>>>>> 57d2674 ((#5) Add macros for compiler attributes)
 
 #define FAT12_MAX_FAT_SECTORS 16
 
-struct __attribute__((packed)) fat12_bpb
+struct __packed fat12_bpb
 {
     uint8_t jmp[3];
     char oem[8];
@@ -29,7 +33,7 @@ struct __attribute__((packed)) fat12_bpb
 };
 _Static_assert(sizeof(struct fat12_bpb) == 62, "bpb size");
 
-struct __attribute__((packed)) fat_dirent
+struct __packed fat_dirent
 {
     char name[11];
     uint8_t attr;
@@ -54,7 +58,7 @@ typedef struct {
     uint32_t root_sectors;
     uint32_t data_start;
     uint32_t cluster_count;
-    uint8_t  fat[FAT12_MAX_FAT_SECTORS * 512] __attribute__((aligned(2)));
+    uint8_t  fat[FAT12_MAX_FAT_SECTORS * 512] __aligned(2);
 } fat12_t; 
 
 struct find_ctx

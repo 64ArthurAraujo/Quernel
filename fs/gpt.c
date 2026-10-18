@@ -3,6 +3,7 @@
 #include "../drivers/tty.h"
 #include "../libc/memory.h"
 #include "../kernel/printk/printk.h"
+#include "../kernel/macros.h"
 
 /**
  * returns 1 if valid, 0 on error.
@@ -26,7 +27,7 @@ int is_gpt_valid(const struct gpt_header *h)
 
 int gpt_read(ata_drive_t *drive, gpt_part_t *out, int max)
 {
-    uint8_t sec[512] __attribute__((aligned(2)));
+    uint8_t sec[512] __aligned(2);
 
     if (ata_read_28bit_pio((uint16_t *)sec, drive, 1) != 0)
         return -1;

@@ -31,7 +31,11 @@ int is_bootsect_valid(const struct fat12_bpb *b_sec)
  */
 int fat12_mount(fat12_t *fs, partition_t *part)
 {
+<<<<<<< HEAD
     uint8_t sec[512] __attribute__((aligned(2)));
+=======
+    uint8_t sec[512] __aligned(2);
+>>>>>>> 57d2674 ((#5) Add macros for compiler attributes)
 
     if (read_partition(part, 0, sec) != 0)
     {
@@ -121,7 +125,11 @@ static int scan_sector(const uint8_t *sec, fat12_dir_cb cb, void *ctx)
 
 int fat12_walk_dir(fat12_t *fs, uint16_t dir_cluster, fat12_dir_cb cb, void *ctx)
 {
+<<<<<<< HEAD
     uint8_t sec[512] __attribute__((aligned(2)));
+=======
+    uint8_t sec[512] __aligned(2);
+>>>>>>> 57d2674 ((#5) Add macros for compiler attributes)
     int r;
 
     if (dir_cluster == 0)
@@ -304,7 +312,11 @@ int fat12_lookup(fat12_t *fs, const char *path, struct fat_dirent *out)
 
 int32_t fat12_read(fat12_t *fs, const struct fat_dirent *e, void *dst, uint32_t max)
 {
+<<<<<<< HEAD
     uint8_t sec[512] __attribute__((aligned(2)));
+=======
+    uint8_t sec[512] __aligned(2);
+>>>>>>> 57d2674 ((#5) Add macros for compiler attributes)
     uint8_t *out = dst;
     uint32_t remaining = e->size < max ? e->size : max;
     uint32_t total = 0;
