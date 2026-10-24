@@ -87,13 +87,6 @@ char *string(char *buf, char *end, const char *s)
     return buf;
 }
 
-char *number(char *buf, char *end, uint32_t num)
-{
-    const char number_to_str[12];
-    u32_to_str(num, (char *)number_to_str);
-    return string(buf, end, number_to_str);
-}
-
 /**
  * vsnprintf - Format a string and place it in the buffer
  * @buf: The buffer to place the result into
