@@ -11,13 +11,13 @@ int is_bootsect_valid(const struct fat12_bpb *b_sec)
 {
     if (b_sec->bytes_per_sector != 512)
     {
-        printk("Invalid size of bytes per sector, not 512!\n");
+        pr_err("Invalid size of bytes per sector, not 512!\n");
         return 0;
     }
 
     if (b_sec->sectors_per_cluster == 0 || (b_sec->sectors_per_cluster & (b_sec->sectors_per_cluster - 1)))
     {
-        printk("Invalid number of sectors per cluster!\n");
+        pr_err("Invalid number of sectors per cluster!\n");
         return 0;
     }
 
@@ -35,7 +35,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (read_partition(part, 0, sec) != 0)
     {
-        printk("Failed to read partition!\n");
+        pr_err("Failed to read partition!\n");
         return -1;
     }
 
@@ -46,7 +46,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (is_bootsect_valid(b) == 0)
     {
-        printk("Failed to validate the boot sector!\n");
+        pr_err("Failed to validate the boot sector!\n");
         return -3;
     }
 
@@ -61,7 +61,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (total <= fs->data_start)
     {
-        printk("Total of sectors is less or equal to the data_start!\n");
+        pr_err("Total of sectors is less or equal to the data_start!\n");
         return -3;
     }
 
@@ -69,7 +69,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
 
     if (fs->cluster_count >= 4085)
     {
-        printk("Cluster count exceeds 4085, this partition is likely not a FAT12 partition!\n");
+        pr_err("Cluster count exceeds 4085, this partition is likely not a FAT12 partition!\n");
         return -5;
     }
 
@@ -78,7 +78,7 @@ int fat12_mount(fat12_t *fs, partition_t *part)
         // Load the data into fs->fat
         if (read_partition(part, fs->fat_start + i, fs->fat + i * 512) != 0)
         {
-            printk("Failed to read filesys data!\n");
+            pr_err("Failed to read filesys data!\n");
             return -1;
         }
     }
@@ -220,16 +220,16 @@ static int print_entry(const struct fat_dirent *e, void *ctx)
     char name[13], num[11];
 
     fat12_format_name(e, name);
-    printk("%s", name);
+    pr_debug("%s", name);
 
     if (e->attr & ATTR_DIR)
     {
-        printk("  <DIR>\n");
+        pr_debug("  <DIR>\n");
     }
     else
     {
         u32_to_str(e->size, num);
-        printk("  %s bytes\n", num);
+        pr_debug("  %s bytes\n", num);
     }
     return 0;
 }

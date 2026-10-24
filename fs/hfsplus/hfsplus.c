@@ -228,9 +228,9 @@ static int ls_cb(const hfsp_entry_t *e, void *ctx)
     u32_to_str(e->size, num);
 
     if (e->is_dir)
-        printk("%s  <DIR>\n", e->name);
+        pr_debug("%s  <DIR>\n", e->name);
     else
-        printk("%s  %s bytes\n", e->name, num);
+        pr_debug("%s  %s bytes\n", e->name, num);
 
     return 0;
 }

@@ -50,7 +50,7 @@ static int ata_identify(uint8_t channel, uint8_t slave, ata_drive_t *drive)
 
     if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
-        printk("Failed to identify disk!\n");
+        pr_err("Failed to identify disk!\n");
         return 0;
     }
 
@@ -96,7 +96,7 @@ void ata_detect_drives()
     }
 
     if (!found)
-        printk("ATA: Not a single device was detected\n");
+        pr_err("ATA: Not a single device was detected\n");
 }
 
 
@@ -127,13 +127,13 @@ int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset
 
     if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
-        printk("28bit pio failed to read sectors!\n");
+        pr_err("28bit pio failed to read sectors!\n");
         return -1;
     }
 
     if (!(status & ATA_SR_DRQ))
     {
-        printk("28bit pio failed to read sectors! No DRQ\n");
+        pr_err("28bit pio failed to read sectors! No DRQ\n");
         return -1;
     }
 

@@ -45,14 +45,14 @@ void do_mount_root()
 
             if (!is_fat12_mounted && fat12_mount(&fat12_fs, &part) == 0)
             {
-                printk("Mounted FAT12 file system!\n");
+                pr_debug("Mounted FAT12 file system!\n");
                 is_fat12_mounted = 1;
                 continue;
             }
 
             if (!is_hfs_mounted && hfsplus_mount(&hfs_fs, &part) == 0)
             {
-                printk("Mounted HFS+ file system!\n");
+                pr_debug("Mounted HFS+ file system!\n");
                 is_hfs_mounted = 1;
                 continue;
             }

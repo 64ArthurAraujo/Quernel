@@ -13,13 +13,13 @@ int is_gpt_valid(const struct gpt_header *h)
 {
     if (memcmp(h->signature, "EFI PART", 8) != 0)
     {
-        printk("GPT Partition table signature is wrong!\n");
+        pr_err("GPT Partition table signature is wrong!\n");
         return 0;
     }
 
     if (h->entry_size != 128 || h->entries_lba > 0x0FFFFFFF)
     {
-        printk("Partition table header size is too large!\n");
+        pr_err("Partition table header size is too large!\n");
         return 0;
     }
 
