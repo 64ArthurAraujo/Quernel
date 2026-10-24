@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 enum format_state
 {
@@ -10,6 +11,7 @@ enum format_state
     FORMAT_STATE_CHAR,
     FORMAT_STATE_STR,
     FORMAT_STATE_PERCENT_CHAR,
+    FORMAT_STATE_NUM,
     FORMAT_STATE_INVALID,
 };
 
@@ -51,6 +53,9 @@ struct fmt format_decode(struct fmt fmt)
         ['c'] = {FORMAT_STATE_CHAR},
         ['s'] = {FORMAT_STATE_STR},
         ['%'] = {FORMAT_STATE_PERCENT_CHAR},
+
+        // Numerics
+        ['i'] = {FORMAT_STATE_NUM, 0, 1, 10},
     };
 
     const struct format_state *p = lookup_state + (uint8_t)*fmt.str;
@@ -70,7 +75,7 @@ char *string(char *buf, char *end, const char *s)
 {
     if (!s)
         s = "(null)";
-    
+
     while (*s)
     {
         if (buf < end)
@@ -80,6 +85,13 @@ char *string(char *buf, char *end, const char *s)
     }
 
     return buf;
+}
+
+char *number(char *buf, char *end, uint32_t num)
+{
+    const char number_to_str[12];
+    u32_to_str(num, (char *)number_to_str);
+    return string(buf, end, number_to_str);
 }
 
 /**
@@ -148,6 +160,23 @@ int vsnprintf(char *buf, size_t size, const char *fmt_str, va_list args)
         case FORMAT_STATE_STR:
         {
             str = string(str, end, va_arg(args, char *));
+            continue;
+        }
+
+        case FORMAT_STATE_NUM:
+        {
+            int32_t num = va_arg(args, int32_t);
+            char tmp[12];
+            char *p = tmp;
+
+            uint32_t u = (uint32_t)num;
+            if (num < 0)
+            {
+                *p++ = '-';
+                u = -u;
+            }
+            u32_to_str(u, p);
+            str = string(str, end, tmp);
             continue;
         }
 
