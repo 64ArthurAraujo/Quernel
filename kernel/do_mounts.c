@@ -8,6 +8,13 @@
 #include <string.h>
 #include <stdint.h>
 
+int count_drives(ata_drive_t *d)
+{
+    int found = 0;
+    for (int i = 0; i < 4; i++) if (d[i].present == 1) found++;
+    return found;
+}
+
 int read_drive(ata_drive_t drive, fat12_t *fat12, hfsplus_t *hfsp, partition_t *part)
 {
     printk("ATA: %s\n", (char *)drive.model);
@@ -51,19 +58,6 @@ int read_drive(ata_drive_t drive, fat12_t *fat12, hfsplus_t *hfsp, partition_t *
     return 1;
 }
 
-int total_drives(ata_drive_t *drives)
-{
-    int found = 0;
-
-    for (int drive_i = 0; drive_i < 4; drive_i++)
-    {
-        if (drives[drive_i].present == 1)
-            found += 1;
-    }
-
-    return found;
-}
-
 void do_mount_root()
 {
     ata_drive_t *drives = get_ata_drives();
@@ -72,7 +66,7 @@ void do_mount_root()
     static fat12_t fat12_fs;
     static hfsplus_t hfs_fs;
 
-    int drive_num = total_drives(drives);
+    int drive_num = count_drives(drives);
 
     for (int drive_i = 0; drive_i < drive_num; drive_i++)
     {
