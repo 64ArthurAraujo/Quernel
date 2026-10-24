@@ -19,13 +19,6 @@ static void parse_fork(const uint8_t *p, hfsp_fork_t *f)
     }
 }
 
-static void print_kv(const char *label, uint32_t v)
-{
-    // char num[12];
-    // u32_to_str(v, num);
-    // printk("%s%s\n", label, num);
-}
-
 int hfsp_read_bytes(hfsplus_t *fs, const hfsp_fork_t *f, uint32_t off, void *dst, uint32_t len)
 {
     uint8_t sec[512] __aligned(2);
@@ -239,17 +232,6 @@ static int ls_cb(const hfsp_entry_t *e, void *ctx)
     else
         printk("%s  %s bytes\n", e->name, num);
 
-    return 0;
-}
-
-static int dump_cb(const hfsp_entry_t *e, void *ctx)
-{
-    (void)ctx;
-    char p[12], c[12];
-    u32_to_str(e->parent, p);
-    u32_to_str(e->cnid, c);
-    printk("parent=%s cnid=%s %s '%s'\n",
-           p, c, e->is_dir ? "dir " : "file", e->name);
     return 0;
 }
 
