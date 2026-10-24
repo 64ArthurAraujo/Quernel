@@ -5,7 +5,6 @@
 #include <memory.h>
 
 #include "hfsplus.h"
-#include "utils.h"
 
 static void parse_fork(const uint8_t *p, hfsp_fork_t *f)
 {
@@ -240,8 +239,6 @@ void hfsplus_ls(hfsplus_t *fs, uint32_t dir_cnid)
     hfsp_scan(fs, ls_cb, &dir_cnid);
 }
 
-static char fold_c(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
-
 static int find_cb(const hfsp_entry_t *e, void *ctx)
 {
     find_ctx *f = ctx;
@@ -250,7 +247,7 @@ static int find_cb(const hfsp_entry_t *e, void *ctx)
 
     const char *a = e->name, *b = f->name;
     for (; *a && *b; a++, b++)
-        if (f->fold ? fold_c(*a) != fold_c(*b) : *a != *b)
+        if (f->fold ? upper(*a) != upper(*b) : *a != *b)
             return 0;
     if (*a || *b)
         return 0;

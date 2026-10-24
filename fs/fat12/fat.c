@@ -166,8 +166,6 @@ int fat12_walk_dir(fat12_t *fs, uint16_t dir_cluster, fat12_dir_cb cb, void *ctx
     return 0;
 }
 
-static char upper(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
-
 static void fat12_format_name(const struct fat_dirent *e, char *out)
 {
     int p = 0;

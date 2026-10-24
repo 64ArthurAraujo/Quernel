@@ -2,6 +2,8 @@
 #include <drivers/ata.h>
 #include <stdint.h>
 
+#include "common.h"
+
 // HFS PLUS
 typedef struct
 {

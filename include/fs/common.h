@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 
+static char upper(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
+
 static inline uint16_t be16(const uint8_t *p) { return (p[0] << 8) | p[1]; }
 static inline uint32_t be32(const uint8_t *p)
 {

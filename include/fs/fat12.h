@@ -1,6 +1,8 @@
 #pragma once
 #include <quernel/macros.h>
 
+#include "common.h"
+
 #define FAT12_MAX_FAT_SECTORS 16
 
 struct __packed fat_dirent
