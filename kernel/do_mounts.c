@@ -4,6 +4,7 @@
 #include <drivers/ata.h>
 #include <fs/fat12.h>
 #include <fs/hfs.h>
+#include <fs/ext.h>
 #include <fs/gpt.h>
 #include <string.h>
 #include <stdint.h>
@@ -11,11 +12,13 @@
 int count_drives(ata_drive_t *d)
 {
     int found = 0;
-    for (int i = 0; i < 4; i++) if (d[i].present == 1) found++;
+    for (int i = 0; i < 4; i++)
+        if (d[i].present == 1)
+            found++;
     return found;
 }
 
-int read_drive(ata_drive_t drive, fat12_t *fat12, hfsplus_t *hfsp, partition_t *part)
+int read_drive(ata_drive_t drive, fat12_t *fat12, hfsplus_t *hfsp, ext2_t *ext2, partition_t *part)
 {
     printk("ATA: %s\n", (char *)drive.model);
 
@@ -33,6 +36,7 @@ int read_drive(ata_drive_t drive, fat12_t *fat12, hfsplus_t *hfsp, partition_t *
 
     int is_fat12_mounted = 0;
     int is_hfs_mounted = 0;
+    int is_ext2_mounted = 0;
 
     for (int i = 0; i < r; i++)
     {
@@ -53,6 +57,26 @@ int read_drive(ata_drive_t drive, fat12_t *fat12, hfsplus_t *hfsp, partition_t *
             is_hfs_mounted = 1;
             continue;
         }
+
+        if (!is_ext2_mounted && ext2_mount(ext2, part) == 0)
+        {
+            pr_debug("Mounted ext2 file system!\n");
+            is_ext2_mounted = 1;
+
+            ext2_inode root, lpf;
+            uint32_t ino;
+
+            ext2_iget(ext2, EXT2_ROOT_INO, &root);
+
+            int r = ext2_lookup(ext2, &root, "hello.txt", strlen("hello.txt"), &lpf, &ino);
+
+            if (r == 0)
+                pr_info("hello.txt = inode %i, mode 0x%i\n", ino, lpf.i_mode);
+            else if (r == -ENOENT)
+                pr_info("not found\n");
+
+            continue;
+        }
     }
 
     return 1;
@@ -65,12 +89,13 @@ void do_mount_root()
     partition_t part;
     static fat12_t fat12_fs;
     static hfsplus_t hfs_fs;
+    static ext2_t ext2_fs;
 
     int drive_num = count_drives(drives);
 
     for (int drive_i = 0; drive_i < drive_num; drive_i++)
     {
-        read_drive(drives[drive_i], &fat12_fs, &hfs_fs, &part);
+        read_drive(drives[drive_i], &fat12_fs, &hfs_fs, &ext2_fs, &part);
 
 #if !ALLOW_MULTIDISK
         if (drive_num > 1)

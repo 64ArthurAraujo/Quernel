@@ -1,6 +1,14 @@
 #pragma once
 #include <stdint.h>
 
+#define ENOENT        2
+#define EIO           5
+#define ENOMEM        12
+#define ENOTDIR       20
+#define EINVAL        22
+#define ENAMETOOLONG  36
+#define ESTALE        116
+
 static char upper(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
 
 static inline uint16_t be16(const uint8_t *p) { return (p[0] << 8) | p[1]; }
