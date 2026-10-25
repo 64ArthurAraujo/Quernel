@@ -1,5 +1,6 @@
 #pragma once
 #include <quernel/macros.h>
+#include <stdint.h>
 
 // ext2
 
