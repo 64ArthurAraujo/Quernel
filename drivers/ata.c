@@ -99,7 +99,6 @@ void ata_detect_drives()
         pr_err("ATA: Not a single device was detected\n");
 }
 
-
 void read_sector_data(uint16_t base, uint16_t *buffer)
 {
     for (int i = 0; i < 256; i++)
@@ -121,19 +120,27 @@ int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset
     port_byte_out(base + ATA_REG_STATUS, ATA_CMD_READSECTORS);
     ata_delay(ctrl);
 
+    uint32_t timeout = 100000;
+
     uint8_t status;
-    while ((status = port_byte_in(base + ATA_REG_STATUS)) & ATA_SR_BSY)
+    while (((status = port_byte_in(base + ATA_REG_STATUS)) & ATA_SR_BSY) && --timeout)
         ;
+
+    if (timeout == 0 || status == 0xFF)
+    {
+        pr_err("ata fatal: BSY timed out!\n");
+        return -1;
+    }
 
     if (status & (ATA_SR_ERR | ATA_SR_DF))
     {
-        pr_err("28bit pio failed to read sectors!\n");
+        pr_err("ata fatal: 28bit pio failed to read sectors!\n");
         return -1;
     }
 
     if (!(status & ATA_SR_DRQ))
     {
-        pr_err("28bit pio failed to read sectors! No DRQ\n");
+        pr_err("ata fatal: 28bit pio failed to read sectors! No DRQ\n");
         return -1;
     }
 
@@ -143,6 +150,7 @@ int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset
 
 int read_partition(partition_t *p, uint32_t sector, void *buf)
 {
-    if (sector >= p->count) return -1;
+    if (sector >= p->count)
+        return -1;
     return ata_read_28bit_pio(buf, p->drive, p->start + sector);
 }
