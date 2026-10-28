@@ -13,8 +13,6 @@
 #define EXT2_TIND_BLOCK (EXT2_DIND_BLOCK + 1)
 #define EXT2_N_BLOCKS (EXT2_TIND_BLOCK + 1)
 
-#define EXT2_ROOT_INO 2
-
 #define EXT2_MAX_GROUPS 64
 
 /*
@@ -149,6 +147,7 @@ typedef struct
     uint32_t block_size;
     uint32_t inode_size;
     uint32_t group_count;
+    ext2_inode root_inode; /* The root directory inode */
 } ext2_t;
 
 typedef struct

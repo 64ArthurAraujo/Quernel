@@ -64,5 +64,8 @@ int ext2_mount(ext2_t *fs, partition_t *part)
         copied += chunk;
     }
 
+    // Pre read the root inode
+    ext2_iget(fs, EXT2_ROOT_INO, &(fs->root_inode));
+
     return 0;
 }
