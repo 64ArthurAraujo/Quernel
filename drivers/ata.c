@@ -120,7 +120,7 @@ int ata_read_28bit_pio(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset
     port_byte_out(base + ATA_REG_STATUS, ATA_CMD_READSECTORS);
     ata_delay(ctrl);
 
-    uint32_t timeout = 100000;
+    uint32_t timeout = 500000;
 
     uint8_t status;
     while (((status = port_byte_in(base + ATA_REG_STATUS)) & ATA_SR_BSY) && --timeout)
