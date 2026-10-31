@@ -28,3 +28,8 @@
 #define ATA_CMD_IDENTIFY     0xEC
 #define ATA_CMD_READSECTORS  0x20
 
+static void ata_delay(uint8_t ctrl)
+{
+    for (int i = 0; i < 4; i++)
+        port_byte_in(ctrl);
+}
