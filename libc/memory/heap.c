@@ -3,6 +3,7 @@
  *
  *  Implementations taken from MyraOS (https://github.com/dvir-biton/MyraOS/blob/main/system/memory/src/heap/heap.c)
  */
+#include <quernel/printk.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -22,7 +23,7 @@ heap_block_t *split_block(heap_block_t *block, size_t size)
 {
     if (block->size > size)
     {
-        // TODO: kmalloc might be used before we have a tty, check this later
+        pr_err("split block failed: block_size > size");
         return NULL;
     }
 
