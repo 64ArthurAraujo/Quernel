@@ -4,6 +4,14 @@
 
 #include "ext2.h"
 
+/* Calculates the length of the specified path */
+uint32_t pathlen(const char *path)
+{
+    uint32_t len = 0;
+    while(path[len] && path[len] != '/') len++;
+    return len;
+}
+
 /* Resolves an absolute path. */
 int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino)
 {
@@ -27,9 +35,8 @@ int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino)
         if (!*path)
             break;
 
-        uint32_t len = 0;
-        while (path[len] && path[len] != '/')
-            len++;
+        uint32_t len = pathlen(path);
+
         if (len > EXT2_NAME_LEN)
             return -ENAMETOOLONG;
 
