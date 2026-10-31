@@ -7,6 +7,7 @@ PHDRS {
 
 SECTIONS {
     . = 0x100000;
+    _kernel_start = .;
 
     .multiboot : { *(.multiboot) } :text
     .text      : { *(.text)      } :text
@@ -14,4 +15,7 @@ SECTIONS {
 
     .data : { *(.data)          } :data
     .bss  : { *(.bss) *(COMMON) } :data
+
+    . = ALIGN(0x1000);
+    _kernel_end = .;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stddef.h>
 
 #define low_16(address) (uint16_t)((address)&0xFFFF)
 #define high_16(address) (uint16_t)(((address) >> 16) & 0xFFFF)
@@ -9,4 +10,7 @@ void memcpy(char *dest, char *src, int n);
 void memset(void *dest, uint8_t val, uint32_t len);
 void *memmove(void *dest, const void *src, uint32_t n);
 
-uint32_t kmalloc(uint32_t size, int align, uint32_t *physical_addr);
+/* libc/memory/heap.c */
+void heap_init(uintptr_t start, size_t size);
+void *kmalloc(size_t size);
+void kfree(void *ptr);

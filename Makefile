@@ -9,7 +9,7 @@ DATA_DIR     = rootfs
 DATA_IMG     = data.ext2
 DATA_SIZE_MB = 256
 
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c drivers/*/*.c cpu/*.c libc/*.c fs/*.c kernel/printk/*.c fs/*/*.c)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c drivers/*/*.c cpu/*.c libc/*.c libc/*/*.c fs/*.c kernel/printk/*.c fs/*/*.c)
 HEADERS   = $(wildcard */*.h */*/*.h)
 OBJ       = $(C_SOURCES:.c=.o) cpu/interrupt.o
 
