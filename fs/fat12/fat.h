@@ -43,3 +43,20 @@ typedef int (*fat12_dir_cb)(const struct fat_dirent *e, void *ctx);
 #define ATTR_LFN    0x0F
 
 #define FAT12_VALID(c) ((c) >= 2 && (c) <= 0xFEF)
+
+/* super.c */
+int fat12_mount(fat12_t *fs, partition_t *part);
+
+/* dir.c */
+int fat12_walk_dir(fat12_t *fs, uint16_t dir_cluster, fat12_dir_cb cb, void *ctx);
+void fat12_ls(fat12_t *fs, uint16_t dir_cluster);
+uint32_t cluster_to_sector(const fat12_t *fs, uint16_t c);
+uint16_t fat12_next(const fat12_t *fs, uint16_t c);
+
+/* namei.c */
+int fat12_lookup(fat12_t *fs, const char *path, struct fat_dirent *out);
+void fat12_format_name(const struct fat_dirent *e, char *out);
+int fat12_make_83(const char *s, char out[11]);
+
+/* file.c */
+int32_t fat12_read(fat12_t *fs, const struct fat_dirent *e, void *dst, uint32_t max);
