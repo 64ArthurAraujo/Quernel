@@ -4,9 +4,6 @@
 
 extern uint8_t kernel_end;
 
-#define HEAP_START_ADDR 0xC1000000
-#define HEAP_SIZE (1024 * 1024 * 128)   // 128MB heap
-
 #define TOTAL_MEMORY (1024 * 1024 * 1024)        // 1 GB
 #define PAGE_SIZE 4096                           // 4 KB
 #define PAGES_AMOUNT (TOTAL_MEMORY / PAGE_SIZE)  // 262,144

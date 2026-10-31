@@ -14,7 +14,7 @@
 extern uint32_t _kernel_start;
 extern uint32_t _kernel_end;
 
-#define KERNEL_SIZE_IN_PAGES (((_kernel_end - _kernel_start) + PAGE_SIZE - 1) / PAGE_SIZE)
+#define KERNEL_SIZE_IN_PAGES (((&_kernel_end - &_kernel_start) + PAGE_SIZE - 1) / PAGE_SIZE)
 
 __attribute__((section(".boot.text"))) static void load_page_directory(uint32_t page_dir)
 {

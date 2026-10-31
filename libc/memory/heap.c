@@ -6,6 +6,7 @@
 #include <quernel/printk.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <memory.h>
 
 #include "heap.h"
 #include "pmm.h"
@@ -21,16 +22,13 @@ heap_block_t *h_end;
 */
 heap_block_t *split_block(heap_block_t *block, size_t size)
 {
-    if (block->size > size)
-    {
-        pr_err("split block failed: block_size > size");
-        return NULL;
-    }
+    if (block->size < size + sizeof(heap_block_t))
+        return block; /* too small to split, use the whole block */
 
     heap_block_t *new_block = (heap_block_t *)((uintptr_t)block + sizeof(heap_block_t) + size);
 
     new_block->size = block->size - size - sizeof(heap_block_t);
-    new_block->free = true;
+    new_block->free = 1;
     new_block->next = block->next;
 
     if (new_block->next == NULL)
@@ -39,7 +37,7 @@ heap_block_t *split_block(heap_block_t *block, size_t size)
     }
 
     block->size = size;
-    block->free = false;
+    block->free = 0;
     block->next = new_block;
 
     return block;
@@ -47,18 +45,10 @@ heap_block_t *split_block(heap_block_t *block, size_t size)
 
 void heap_init(uintptr_t start, size_t size)
 {
-    for (size_t offset = 0; offset < size; offset += PAGE_SIZE)
-    {
-        uintptr_t virt = start + offset;
-        uintptr_t phys = (uintptr_t)pmm_alloc_page();
-        vmm_map_page(virt, phys, PAGE_PRESENT | PAGE_WRITE);
-    }
     h_start = (heap_block_t *)start;
-
     h_start->size = size - sizeof(heap_block_t);
     h_start->free = 1;
     h_start->next = NULL;
-
     h_end = h_start;
 }
 
@@ -77,48 +67,14 @@ void *kmalloc(size_t size)
 
     if (curr_block == NULL)
     {
-        uintptr_t natural_addr = (uintptr_t)h_end + h_end->size + sizeof(heap_block_t);
-
-        uintptr_t aligned_addr = (natural_addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-        heap_block_t *new_block = (heap_block_t *)aligned_addr;
-
-        size_t total_needed = size + sizeof(heap_block_t);
-        size_t pages_needed = (total_needed + PAGE_SIZE - 1) / PAGE_SIZE;
-
-        for (size_t i = 0; i < pages_needed; i++)
-        {
-            uintptr_t phys = (uintptr_t)pmm_alloc_page();
-
-            if (phys == 0)
-            {
-                for (size_t j = 0; j < i; j++)
-                {
-                    vmm_unmap_page(aligned_addr + j * PAGE_SIZE);
-                }
-                return NULL;
-            }
-            vmm_map_page(aligned_addr + i * PAGE_SIZE, phys, PAGE_PRESENT | PAGE_WRITE);
-        }
-
-        uintptr_t gap_size = aligned_addr - natural_addr;
-        if (gap_size > 0)
-            h_end->size += gap_size;
-
-        new_block->size = (pages_needed * PAGE_SIZE) - sizeof(heap_block_t);
-        new_block->free = 1;
-        new_block->next = NULL;
-
-        h_end->next = new_block;
-        h_end = new_block;
-        curr_block = new_block;
+        return NULL;
     }
 
-    if (curr_block->size > size * sizeof(heap_block_t) + 8)
+    if (curr_block->size >= size + sizeof(heap_block_t) + 8)
     {
         curr_block = split_block(curr_block, size);
     }
 
-    curr_block->free = 0;
     return GET_METADATA_ADDR(curr_block);
 }
 
