@@ -52,7 +52,7 @@ int ext2_find_entry(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_
     if (nblocks == 0)
         return -ENOENT;
 
-    uint8_t buf[bs];
+    uint8_t *buf = (uint8_t *)kmalloc(bs);
     if (!buf)
         return -ENOMEM;
 
@@ -102,5 +102,6 @@ int ext2_find_entry(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_
     }
 
 out:
+    kfree(buf);
     return err;
 }

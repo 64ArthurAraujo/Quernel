@@ -52,24 +52,3 @@ void *memmove(void *dest, const void *src, uint32_t n)
 
     return dest;
 }
-
-uint32_t free_mem_address = 0x10000;
-
-uint32_t kmalloc(uint32_t size, int align, uint32_t *physical_addr)
-{
-    if (align == 1 && (free_mem_address & 0xFFFFF000))
-    {
-        free_mem_address &= 0xFFFFF000;
-        free_mem_address += 0x1000;
-    }
-
-    if (physical_addr)
-    {
-        *physical_addr = free_mem_address;
-    }
-
-    uint32_t ret = free_mem_address;
-    free_mem_address += size;
-
-    return ret;
-}

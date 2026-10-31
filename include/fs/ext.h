@@ -143,7 +143,7 @@ typedef struct
 {
     partition_t part;
     ext2_super_block sb;
-    ext2_group_desc bgd[EXT2_MAX_GROUPS];
+    ext2_group_desc *bgd;
     uint32_t block_size;
     uint32_t inode_size;
     uint32_t group_count;

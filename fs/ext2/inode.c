@@ -69,7 +69,7 @@ int64_t ext2_bmap(ext2_t *fs, const ext2_inode *ino, uint32_t i_block)
     if (depth == 1)
         return blk; // direct block
 
-    uint8_t buf[fs->block_size];
+    uint8_t *buf = (uint8_t *)kmalloc(fs->block_size);
 
     if (!buf)
         return -1;
@@ -77,19 +77,23 @@ int64_t ext2_bmap(ext2_t *fs, const ext2_inode *ino, uint32_t i_block)
     for (int i = 1; i < depth; i++)
     {
         if (blk == 0)
+        {
+            kfree(buf);
             return 0;
+        }
 
         if (ext2_read_block(fs, blk, buf) != 0)
         {
+            kfree(buf);
             return -1;
         }
 
         blk = buf[offsets[i]];
     }
 
+    kfree(buf);
     return blk;
 }
-
 
 int ext2_read_inode(ext2_t *fs, uint32_t inode, ext2_inode *out)
 {
@@ -112,19 +116,20 @@ int ext2_read_inode(ext2_t *fs, uint32_t inode, ext2_inode *out)
 
     uint32_t spb = fs->block_size / 512;
 
-    uint8_t buf[fs->block_size];
+    uint8_t *buf = kmalloc(fs->block_size);
 
     if (!buf)
         return -1;
 
     if (ext2_read_block(fs, block, buf) != 0)
     {
-        pr_err("Partition read failed!");
+        pr_err("Partition read failed!\n");
+        kfree(buf);
         return -1;
     }
 
     memcpy((char *)out, buf + offset_in_blk, sizeof(ext2_inode));
-
+    kfree(buf);
     return 0;
 }
 
