@@ -12,10 +12,19 @@
 
 static root_dev sda = {0};
 
+void init_memory()
+{
+    pmm_init();
+    vmm_init();
+    heap_init(HEAP_START_ADDR, HEAP_SIZE);
+}
+
 void init_kernel()
 {
     isr_setup();
     asm volatile("sti");
+
+    init_memory();
 
     printk("Quernel version 0.0.0.i686\n");
 
@@ -39,6 +48,7 @@ void init_kernel()
             pr_debug("%s\n", data);
         }
     }
+
 
     asm volatile("hlt");
 }

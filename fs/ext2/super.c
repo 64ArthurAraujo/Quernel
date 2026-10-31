@@ -42,26 +42,21 @@ int ext2_mount(ext2_t *fs, partition_t *part)
         return -1;
     }
 
-    uint32_t bgd_block = fs->sb.first_data_block + 1;
+    uint32_t start_block = fs->sb.first_data_block + 1;
     uint32_t table_bytes = fs->group_count * sizeof(ext2_group_desc);
     uint32_t table_blocks = (table_bytes + fs->block_size - 1) / fs->block_size;
 
-    static uint8_t blkbuf[4096];
-    if (fs->block_size > sizeof(blkbuf))
+    fs->bgd = kmalloc(table_blocks * fs->block_size);
+    if (!fs->bgd)
         return -1;
 
-    uint32_t copied = 0;
     for (uint32_t i = 0; i < table_blocks; i++)
     {
-        if (ext2_read_block(fs, bgd_block + i, blkbuf) != 0)
+        if (ext2_read_block(fs, start_block + i, (uint8_t *)fs->bgd + i * fs->block_size) != 0)
+        {
+            kfree(fs->bgd);
             return -1;
-
-        uint32_t chunk = table_bytes - copied;
-        if (chunk > fs->block_size)
-            chunk = fs->block_size;
-
-        memcpy((uint8_t *)fs->bgd + copied, blkbuf, chunk);
-        copied += chunk;
+        }
     }
 
     // Pre read the root inode
