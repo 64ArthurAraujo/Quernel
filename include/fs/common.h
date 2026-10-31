@@ -5,6 +5,7 @@
 #define EIO           5
 #define ENOMEM        12
 #define ENOTDIR       20
+#define EISDIR        21
 #define EINVAL        22
 #define ENAMETOOLONG  36
 #define ESTALE        116

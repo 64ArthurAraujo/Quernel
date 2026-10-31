@@ -23,5 +23,22 @@ void init_kernel()
     ata_detect_drives();
     do_mount_root(&sda);
 
+    ext2_t *ext2_part = &(sda.ext2_part);
+
+    ext2_inode ino;
+    uint32_t num;
+    static char data[512];
+
+    if (ext2_namei(ext2_part, "/hello+world.txt", &ino, &num) == 0)
+    {
+        int64_t n = ext2_read_file(ext2_part, &ino, 0, data, sizeof(data) - 1);
+
+        if (n >= 0)
+        {
+            data[n] = 0;
+            pr_debug("%s\n", data);
+        }
+    }
+
     asm volatile("hlt");
 }

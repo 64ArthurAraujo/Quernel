@@ -16,6 +16,8 @@
 
 #define EXT2_ROOT_INO 2
 
+#define EXT2_MAX_BLOCK_SIZE 4096
+
 /*
  * Codes for operating systems
  */
@@ -40,3 +42,6 @@ int ext2_find_entry(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_
 /* namei.c */
 int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, ext2_inode *out, uint32_t *out_ino);
 int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino);
+
+/* file.c */
+int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void *dst, uint32_t count);

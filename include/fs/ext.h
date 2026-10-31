@@ -162,3 +162,5 @@ typedef struct
 int ext2_mount(ext2_t *fs, partition_t *part);
 int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, ext2_inode *out, uint32_t *out_ino);
 int ext2_iget(ext2_t *fs, uint32_t ino, ext2_inode *out);
+int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void *dst, uint32_t count);
+int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino);
