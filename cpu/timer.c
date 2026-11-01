@@ -6,31 +6,42 @@
 #include "isr.h"
 #include "ports.h"
 
-uint32_t tick = 0;
+volatile uint32_t tick = 0;
+static uint32_t timer_freq = 0;
+
+uint32_t timer_get_ticks(void)
+{
+    return tick;
+}
 
 static void timer_callback(registers_t regs)
 {
     tick++;
-    tty_emit("Tick: ");
+}
 
-    char tick_ascii[256];
+void sleep(uint32_t ms)
+{
+    if (timer_freq == 0)
+        return;
 
-    int_to_ascii(tick, tick_ascii);
+    uint32_t ticks = (ms / 1000) * timer_freq + ((ms % 1000) * timer_freq + 999) / 1000;
 
-    tty_emit(tick_ascii);
-    tty_emit("\n");
+    uint32_t start = tick;
+
+    while ((uint32_t)(tick - start) < ticks)
+        asm volatile("hlt");
 }
 
 void init_timer(uint32_t frequency)
 {
-    // set the timer callback function
-    register_interrupt_handler(IRQ0, timer_callback); // IRQ0 receives timer_callback();
+    timer_freq = frequency;
+    register_interrupt_handler(IRQ0, timer_callback);
 
     uint32_t divisor = 1193180 / frequency;
     uint8_t low = (uint8_t)(divisor & 0xFF);
     uint8_t high = (uint8_t)((divisor >> 8) & 0xFF);
 
-    port_byte_out(0x43, 0x36); // command port
+    port_byte_out(0x43, 0x36);
     port_byte_out(0x40, low);
     port_byte_out(0x40, high);
 }

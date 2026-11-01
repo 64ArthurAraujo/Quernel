@@ -57,7 +57,7 @@ void remap_pic()
     port_byte_out(0x21, 0x0);
     port_byte_out(0xA1, 0x0);
 
-    port_byte_out(0x21, 0xFF);
+    port_byte_out(0x21, 0xFE);
     port_byte_out(0xA1, 0xFF);
 }
 

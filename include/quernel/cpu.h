@@ -15,3 +15,5 @@ void port_word_out(unsigned short port, unsigned short data);
 
 // timer.c
 void init_timer(uint32_t freq);
+uint32_t timer_get_ticks(void);
+void sleep(uint32_t ms);

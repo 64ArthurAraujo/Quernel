@@ -21,17 +21,19 @@ void init_memory()
 
 void init_kernel()
 {
+    printk("Quernel version 0.0.0.i686\n");
+
     isr_setup();
     asm volatile("sti");
 
+    init_timer(100); // 100 Hz
     init_memory();
-
-    printk("Quernel version 0.0.0.i686\n");
-
     cpuid_detect();
     ata_detect_drives();
     do_mount_root(&sda);
 
+    sleep(250);
+    
     ext2_t *ext2_part = &(sda.ext2_part);
 
     ext2_inode ino;
