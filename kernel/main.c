@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "do_mounts.h"
+#include "showcases.h"
 
 #include <fs/ext.h>
 
@@ -33,24 +34,9 @@ void init_kernel()
     do_mount_root(&sda);
 
     sleep(250);
-    
-    ext2_t *ext2_part = &(sda.ext2_part);
 
-    ext2_inode ino;
-    uint32_t num;
-    static char data[512];
-
-    if (ext2_namei(ext2_part, "/hello+world.txt", &ino, &num) == 0)
-    {
-        int64_t n = ext2_read_file(ext2_part, &ino, 0, data, sizeof(data) - 1);
-
-        if (n >= 0)
-        {
-            data[n] = 0;
-            pr_debug("%s\n", data);
-        }
-    }
-
+    read_hello_world(sda);
+    // read_hello_world_broken(sda);
 
     asm volatile("hlt");
 }
