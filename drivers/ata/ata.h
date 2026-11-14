@@ -23,10 +23,13 @@
 #define ATA_SR_DRDY          0x40   /* Drive ready */
 #define ATA_SR_ERR           0x01   /* Error */
 #define ATA_SR_DRQ           0x08   /* Data request ready */
+#define ATA_SR_DSC			 0x10   /* drive seek complete */
 
 /* Commands */
 #define ATA_CMD_IDENTIFY     0xEC
 #define ATA_CMD_READSECTORS  0x20
+#define ATA_CMD_WRITESECTORS 0x30
+#define ATA_CMD_FLUSHCACHE   0xE7
 
 static void ata_delay(uint8_t ctrl)
 {
