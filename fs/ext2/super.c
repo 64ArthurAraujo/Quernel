@@ -3,6 +3,15 @@
 
 #include "ext2.h"
 
+int ext2_write_block(ext2_t *fs, uint32_t block, uint16_t *buf)
+{
+    uint32_t spb = fs->block_size / 512;
+    for (uint32_t i = 0; i < spb; i++)
+        if (write_partition(&fs->part, block * spb + i, buf + i * 512) != 0)
+            return -1;
+    return 0;
+}
+
 int ext2_read_block(ext2_t *fs, uint32_t block, void *buf)
 {
     uint32_t spb = fs->block_size / 512;
@@ -11,6 +20,53 @@ int ext2_read_block(ext2_t *fs, uint32_t block, void *buf)
             return -1;
 
     return 0;
+}
+
+/**
+ * ext2_write_bgdt
+ * @fs: the ext2 filesystem
+ * @group: the group to save
+ *
+ * Writes the changes of group to the fs's group descriptor table.
+ */
+int ext2_write_bgdt(ext2_t *fs, uint32_t group)
+{
+    uint32_t bgdt_start_blk = (fs->block_size == 1024) ? 2 : 1;
+    uint32_t desc_size = sizeof(ext2_group_desc);
+
+    uint32_t target_blk = bgdt_start_blk + ((group * desc_size) / fs->block_size);
+    uint32_t offset_in_blk = (group * desc_size) % fs->block_size;
+
+    uint8_t *buf = kmalloc(fs->block_size);
+    ext2_read_block(fs, target_blk, buf);
+
+    memcpy(buf + offset_in_blk, (uint8_t *)&fs->bgd[group], desc_size);
+
+    int r = ext2_write_block(fs, target_blk, (uint16_t *)buf);
+    kfree(buf);
+    return r;
+}
+
+/**
+ * ext2_write_super_block
+ * @fs: the ext2 filesystem
+ *
+ * Writes the changes of fs->sb to the disk.
+ */
+int ext2_write_super_block(ext2_t *fs)
+{
+    uint32_t sb_blk = (fs->block_size == 1024) ? 2 : 1;
+    ;
+    uint32_t offset_in_blk = (fs->block_size == 1024) ? 0 : 1024;
+
+    uint8_t *buf = kmalloc(fs->block_size);
+    ext2_read_block(fs, sb_blk, buf);
+
+    memcpy(buf + offset_in_blk, (uint8_t *)&fs->sb, sizeof(ext2_super_block));
+
+    int r = ext2_write_block(fs, sb_blk, (uint16_t *)buf);
+    kfree(buf);
+    return r;
 }
 
 int ext2_mount(ext2_t *fs, partition_t *part)

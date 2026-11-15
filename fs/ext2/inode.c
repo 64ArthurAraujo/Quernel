@@ -133,6 +133,44 @@ int ext2_read_inode(ext2_t *fs, uint32_t inode, ext2_inode *out)
     return 0;
 }
 
+int ext2_write_inode(ext2_t *fs, uint32_t ino, ext2_inode *inode)
+{
+    if (ino == 0 || ino > fs->sb.inodes_count)
+    {
+        pr_err("Failed to write inode! Invalid ino\n");
+        return -1;
+    }
+
+    uint32_t group = (ino - 1) / fs->sb.inodes_per_group;
+    uint32_t local_idx = (ino - 1) % fs->sb.inodes_per_group;
+
+    uint32_t inode_size = (fs->sb.rev_level == 0) ? 128 : fs->sb.s_inode_size;
+
+    uint32_t byte_offset = local_idx * inode_size;
+    uint32_t target_blk = fs->bgd[group].inode_table + (byte_offset / fs->block_size);
+    uint32_t offset_in_blk = byte_offset % fs->block_size;
+
+    uint8_t *buf = kmalloc(fs->block_size);
+    if (!buf)
+    {
+        pr_err("Failed to write inode! unable to allocate a buffer\n");
+        return -1;
+    }
+
+    if (ext2_read_block(fs, target_blk, buf) < 0)
+    {
+        kfree(buf);
+        pr_err("Failed to write inode! Unable to read the target block\n");
+        return -1;
+    }
+    
+    memcpy(buf + offset_in_blk, (uint8_t *)inode, sizeof(ext2_inode));
+
+    int r = ext2_write_block(fs, target_blk, (uint16_t *) buf);
+    kfree(buf);
+    return r;
+}
+
 int ext2_iget(ext2_t *fs, uint32_t ino, ext2_inode *out)
 {
     uint32_t first_ino = (fs->sb.rev_level == 0) ? 11 : fs->sb.s_first_ino;

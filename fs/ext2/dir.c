@@ -105,3 +105,67 @@ out:
     kfree(buf);
     return err;
 }
+
+int dir_block_has_name(uint8_t *buf, uint32_t limit, const char *name, uint8_t name_len)
+{
+    uint32_t off = 0;
+
+    while (off + 8 <= limit)
+    {
+        ext2_dir_entry *de = (ext2_dir_entry *)(buf + off);
+
+        if (de->rec_len < 8)
+            break;
+
+        if (de->inode && de->name_len == name_len && memcmp(de->name, name, name_len) == 0)
+            return 1;
+
+        off += de->rec_len;
+    }
+
+    return 0;
+}
+
+int dir_block_insert(uint8_t *buf, uint32_t limit, uint32_t ino, const char *name, uint8_t name_len, uint8_t f_type)
+{
+    uint32_t need = EXT2_DIR_REC_LEN(name_len);
+    uint32_t off = 0;
+
+    while (off + 8 <= limit)
+    {
+        ext2_dir_entry *de = (ext2_dir_entry *)(buf + off);
+
+        if (de->rec_len < 8)
+            return 0;
+
+        uint32_t real = de->inode ? EXT2_DIR_REC_LEN(de->name_len) : 0;
+        uint32_t slack = de->rec_len - real;
+
+        if (slack >= need)
+        {
+            ext2_dir_entry *n_de;
+
+            if (real == 0)
+            {
+                n_de = de;
+            }
+            else
+            {
+                n_de = (ext2_dir_entry *)(buf + off + real);
+                n_de->rec_len = de->rec_len - real;
+                de->rec_len = real;
+            }
+
+            n_de->inode = ino;
+            n_de->name_len = name_len;
+            n_de->file_type = f_type;
+
+            memcpy(n_de->name, (char *)name, name_len);
+            return 1;
+        }
+
+        off += de->rec_len;
+    }
+
+    return 0;
+}

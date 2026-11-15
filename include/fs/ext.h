@@ -13,6 +13,12 @@
 #define EXT2_TIND_BLOCK (EXT2_DIND_BLOCK + 1)
 #define EXT2_N_BLOCKS (EXT2_TIND_BLOCK + 1)
 
+#define EXT2_S_IFMT 0xF000
+#define EXT2_S_IFDIR 0x4000
+#define EXT2_S_IFREG 0x8000
+
+#define EXT2_ROOT_INO 2
+
 #define EXT2_MAX_GROUPS 64
 
 /*
@@ -164,3 +170,9 @@ int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t le
 int ext2_iget(ext2_t *fs, uint32_t ino, ext2_inode *out);
 int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void *dst, uint32_t count);
 int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino);
+int ext2_write_block(ext2_t *fs, uint32_t block, uint16_t *buf);
+int ext2_write_bgdt(ext2_t *fs, uint32_t group);
+int ext2_write_super_block(ext2_t *fs);
+int ext2_write_inode(ext2_t *fs, uint32_t ino, ext2_inode *inode);
+ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16_t mode);
+int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, uint16_t mode);
