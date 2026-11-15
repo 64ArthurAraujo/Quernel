@@ -30,7 +30,7 @@ int gpt_read(ata_drive_t *drive, gpt_part_t *out, int max)
 {
     uint8_t sec[512] __aligned(2);
 
-    if (ata_read_28bit_pio((uint16_t *)sec, drive, 1) != 0)
+    if (ata_data_xfer((uint16_t *)sec, drive, 1, DATA_XFER_R) != 0)
         return -1;
 
     const struct gpt_header *h = (const struct gpt_header *)sec;
@@ -49,7 +49,7 @@ int gpt_read(ata_drive_t *drive, gpt_part_t *out, int max)
 
     for (uint32_t s = 0; s < sectors; s++)
     {
-        if (ata_read_28bit_pio((uint16_t *)sec, drive, lba + s) != 0)
+        if (ata_data_xfer((uint16_t *)sec, drive, lba + s, DATA_XFER_R) != 0)
             return -1;
 
         for (uint32_t j = 0; j < per_sector; j++)
