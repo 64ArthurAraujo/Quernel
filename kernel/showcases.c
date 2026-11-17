@@ -39,7 +39,7 @@ void read_hello_world(root_dev sda)
         if (n >= 0)
         {
             data[n] = 0;
-            pr_debug("%s\n", data);
+            tty_emit(data);
         }
     }
 }
