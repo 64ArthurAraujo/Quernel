@@ -222,18 +222,18 @@ int vprintk(const char *fmt, va_list args)
 {
     char text_buf[256];
     uint16_t text_len;
-    va_list args2;
-    uint16_t reserve_size;
-    char prefix_buf[8];
-
-    va_copy(args2, args);
-    reserve_size = vsnprintf(&prefix_buf[0], sizeof(prefix_buf), fmt, args2) + 1;
-    va_end(args2);
 
     /* fill message */
-    text_len = printk_sprint(&text_buf[0], reserve_size, fmt, args);
+    text_len = printk_sprint(&text_buf[0], sizeof(text_buf), fmt, args);
 
     tty_emit(text_buf);
+
+    if (text_len >= 256)
+    {
+        // to print more than 256 chars one should use the tty emit directly.
+        tty_emit("\nvprintk: text exceeded the max 256 chars and was truncated! Use tty_emit for longer messages instead\n");
+    }
+
     return text_len;
 }
 
