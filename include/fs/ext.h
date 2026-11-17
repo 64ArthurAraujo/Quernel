@@ -13,9 +13,26 @@
 #define EXT2_TIND_BLOCK (EXT2_DIND_BLOCK + 1)
 #define EXT2_N_BLOCKS (EXT2_TIND_BLOCK + 1)
 
-#define EXT2_S_IFMT 0xF000
-#define EXT2_S_IFDIR 0x4000
-#define EXT2_S_IFREG 0x8000
+#define S_IFMT   0xF000
+#define S_IFSOCK 0xC000
+#define S_IFLNK  0xA000
+#define S_IFREG  0x8000
+#define S_IFBLK  0x6000
+#define S_IFDIR  0x4000
+#define S_IFCHR  0x2000
+#define S_IFIFO  0x1000
+#define S_ISUID  0x0800
+#define S_ISGID  0x0400
+#define S_ISVTX  0x0200
+
+#define S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)
+#define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
+#define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
+#define S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
+#define S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
+#define S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)
+#define S_ISSOCK(m)	(((m) & S_IFMT) == S_IFSOCK)
+
 
 #define EXT2_ROOT_INO 2
 

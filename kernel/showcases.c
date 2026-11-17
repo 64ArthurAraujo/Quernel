@@ -72,7 +72,7 @@ void create_and_find_file(root_dev sda)
     ext2_t *ext2_part = &(sda.ext2_part);
     ext2_inode *root_dir = &(ext2_part->root_inode);
 
-    ext2_create_file(ext2_part, root_dir, EXT2_ROOT_INO, "test", EXT2_S_IFREG);
+    ext2_create_file(ext2_part, root_dir, EXT2_ROOT_INO, "test", S_IFREG);
 
     ext2_inode inode;
     uint32_t ino;
@@ -119,7 +119,7 @@ void create_write_and_read_file(root_dev sda)
     ext2_t *ext2_part = &(sda.ext2_part);
     ext2_inode *root_dir = &(ext2_part->root_inode);
 
-    ext2_create_file(ext2_part, root_dir, EXT2_ROOT_INO, "os+lusiadas", EXT2_S_IFREG);
+    ext2_create_file(ext2_part, root_dir, EXT2_ROOT_INO, "os+lusiadas", S_IFREG);
 
     ext2_inode inode;
     uint32_t ino;

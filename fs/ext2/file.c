@@ -65,7 +65,7 @@ int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, 
         goto out;
     }
 
-    f_inode->i_mode = EXT2_S_IFREG | (mode & 0x0FFF);
+    f_inode->i_mode = S_IFREG | (mode & 0x0FFF);
     f_inode->i_size = 0;
     f_inode->i_blocks = 0;
 
@@ -123,9 +123,9 @@ int ext2_write_file(ext2_t *fs, ext2_inode *inode, uint32_t ino, uint32_t offset
     if (len == 0)
         return 0;
 
-    if ((inode->i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR)
+    if (S_ISDIR(inode->i_mode))
         return -EISDIR;
-    if ((inode->i_mode & EXT2_S_IFMT) != EXT2_S_IFREG)
+    if (!S_ISREG(inode->i_mode))
         return -EINVAL;
 
     uint64_t end = (uint64_t)offset + (uint64_t)len;
@@ -244,9 +244,9 @@ int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void 
     uint8_t *out = (uint8_t *)dst;
     uint32_t done = 0;
 
-    if ((ino->i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR)
+    if (S_ISDIR(ino->i_mode))
         return -EISDIR;
-    if ((ino->i_mode & EXT2_S_IFMT) != EXT2_S_IFREG)
+    if (!S_ISREG(ino->i_mode))
         return -EINVAL;
 
     if (offset > size)

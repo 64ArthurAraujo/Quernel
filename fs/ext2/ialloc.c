@@ -60,7 +60,7 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
     kfree(bitmap);
 
     fs->bgd[f_group].free_inodes_count--;
-    if ((mode & EXT2_S_IFMT) == EXT2_S_IFDIR)
+    if (S_ISDIR(mode))
     {
         fs->bgd[f_group].used_dirs_count++;
     }

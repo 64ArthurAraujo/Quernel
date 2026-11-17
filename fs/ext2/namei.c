@@ -62,7 +62,7 @@ int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t le
     uint32_t ino;
     int res;
 
-    if ((dir->i_mode & EXT2_S_IFMT) != EXT2_S_IFDIR)
+    if (!S_ISDIR(dir->i_mode))
         return -ENOTDIR;
 
     if (len > EXT2_NAME_LEN)
