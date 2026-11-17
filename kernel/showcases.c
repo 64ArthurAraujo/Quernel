@@ -16,7 +16,6 @@
 #include <stdint.h>
 #include <fs/ext.h>
 
-
 /**
  * read_hello_world():
  *
@@ -26,7 +25,15 @@
  */
 void read_hello_world(root_dev sda)
 {
-    ext2_t *ext2_part = &(sda.ext2_part);
+    dev_volume_t v = sda.volumes[vol(3)];
+
+    if (v.fs_type != EXT2_T)
+    {
+        pr_err("Oops, it seems that sda3 does not contain a ext2 fs! (volume.fs_type=%i)\n", v.fs_type);
+        return;
+    }
+
+    ext2_t *ext2_part = (ext2_t *)v.fs;
 
     ext2_inode ino;
     uint32_t num;
@@ -53,7 +60,15 @@ void read_hello_world(root_dev sda)
  */
 void read_hello_world_broken(root_dev sda)
 {
-    ext2_t *ext2_part = &(sda.ext2_part);
+    dev_volume_t v = sda.volumes[vol(3)];
+
+    if (v.fs_type != EXT2_T)
+    {
+        pr_err("Oops, it seems that sda3 does not contain a ext2 fs! (volume.fs_type=%i)\n", v.fs_type);
+        return;
+    }
+
+    ext2_t *ext2_part = (ext2_t *)v.fs;
 
     uint16_t zeros[256] = {0};
     write_partition(&(ext2_part->part), (ext2_part->block_size / 512), zeros);
@@ -69,7 +84,15 @@ void read_hello_world_broken(root_dev sda)
  */
 void create_and_find_file(root_dev sda)
 {
-    ext2_t *ext2_part = &(sda.ext2_part);
+    dev_volume_t v = sda.volumes[vol(3)];
+
+    if (v.fs_type != EXT2_T)
+    {
+        pr_err("Oops, it seems that sda3 does not contain a ext2 fs! (volume.fs_type=%i)\n", v.fs_type);
+        return;
+    }
+
+    ext2_t *ext2_part = (ext2_t *)v.fs;
     ext2_inode *root_dir = &(ext2_part->root_inode);
 
     ext2_create_file(ext2_part, root_dir, EXT2_ROOT_INO, "test", S_IFREG);
@@ -116,7 +139,15 @@ void static write_read(ext2_t *fs, ext2_inode inode, uint32_t ino, char *text)
  */
 void create_write_and_read_file(root_dev sda)
 {
-    ext2_t *ext2_part = &(sda.ext2_part);
+    dev_volume_t v = sda.volumes[vol(3)];
+
+    if (v.fs_type != EXT2_T)
+    {
+        pr_err("Oops, it seems that sda3 does not contain a ext2 fs! (volume.fs_type=%i)\n", v.fs_type);
+        return;
+    }
+
+    ext2_t *ext2_part = (ext2_t *)v.fs;
     ext2_inode *root_dir = &(ext2_part->root_inode);
 
     ext2_create_file(ext2_part, root_dir, EXT2_ROOT_INO, "os+lusiadas", S_IFREG);
