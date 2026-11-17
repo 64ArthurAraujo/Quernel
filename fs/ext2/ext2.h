@@ -49,3 +49,8 @@ int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void 
 
 /* ialloc.c */
 ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16_t mode);
+
+/* balloc.c */
+int ext2_set_bmap(ext2_t *fs, ext2_inode *inode, uint32_t n, uint32_t phys);
+uint32_t ext2_alloc_block(ext2_t *fs, uint32_t ino);
+int ext2_free_block(ext2_t *fs, uint32_t blk);

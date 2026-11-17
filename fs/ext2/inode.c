@@ -115,8 +115,7 @@ int ext2_read_inode(ext2_t *fs, uint32_t inode, ext2_inode *out)
     uint32_t block = fs->bgd[group].inode_table + (byte_offset / fs->block_size);
 
     uint32_t spb = fs->block_size / 512;
-
-    uint8_t *buf = kmalloc(fs->block_size);
+    uint8_t *buf = (uint8_t *)kmalloc(fs->block_size);
 
     if (!buf)
         return -1;
@@ -163,10 +162,10 @@ int ext2_write_inode(ext2_t *fs, uint32_t ino, ext2_inode *inode)
         pr_err("Failed to write inode! Unable to read the target block\n");
         return -1;
     }
-    
+
     memcpy(buf + offset_in_blk, (uint8_t *)inode, sizeof(ext2_inode));
 
-    int r = ext2_write_block(fs, target_blk, (uint16_t *) buf);
+    int r = ext2_write_block(fs, target_blk, (uint16_t *)buf);
     kfree(buf);
     return r;
 }

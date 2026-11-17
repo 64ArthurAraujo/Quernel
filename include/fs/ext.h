@@ -176,3 +176,4 @@ int ext2_write_super_block(ext2_t *fs);
 int ext2_write_inode(ext2_t *fs, uint32_t ino, ext2_inode *inode);
 ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16_t mode);
 int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, uint16_t mode);
+int ext2_write_file(ext2_t *fs, ext2_inode *inode, uint32_t ino, uint32_t offset, void *buf, int len);

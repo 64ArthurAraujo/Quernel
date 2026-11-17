@@ -112,6 +112,129 @@ out:
     return r;
 }
 
+int ext2_write_file(ext2_t *fs, ext2_inode *inode, uint32_t ino, uint32_t offset, void *buf, int len)
+{
+    uint32_t bs = fs->block_size;
+    uint32_t max_size = inode->i_size;
+
+    if (len < 0)
+        return -EINVAL;
+
+    if (len == 0)
+        return 0;
+
+    if ((inode->i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR)
+        return -EISDIR;
+    if ((inode->i_mode & EXT2_S_IFMT) != EXT2_S_IFREG)
+        return -EINVAL;
+
+    uint64_t end = (uint64_t)offset + (uint64_t)len;
+    if (end > 0xFFFFFFFFull)
+        return -EFBIG;
+
+    /* addressable blocks: 12 + P + P^2 + P^3 */
+    uint64_t P = bs / 4;
+    uint64_t max_blocks = 12 + P + P * P + P * P * P;
+    // this was done in balloc as well for instance, because we cant do arithimathics with uint64_t numbers
+    if ((((uint32_t)end) - 1) / ((uint32_t)bs) >= max_blocks)
+        return -EFBIG;
+
+    uint8_t *tmp = (uint8_t *)kmalloc(bs);
+    if (!tmp)
+        return -ENOMEM;
+
+    const uint8_t *src = (const uint8_t *)buf;
+    uint32_t pos = offset;
+    uint32_t remaining = (uint32_t)len;
+    int written = 0;
+    int err = 0;
+    int dirty = 0;
+
+    while (remaining > 0)
+    {
+        uint32_t lbn = pos / bs;
+        uint32_t off = pos % bs;
+        uint32_t chunk = bs - off;
+        if (chunk > remaining)
+            chunk = remaining;
+
+        int64_t phys = ext2_bmap(fs, inode, lbn);
+        if (phys < 0)
+        {
+            err = -EIO;
+            break;
+        }
+
+        int is_new = 0;
+        if (phys == 0)
+        {
+            uint32_t blk = ext2_alloc_block(fs, ino);
+            if (blk == 0)
+            {
+                err = -ENOSPC;
+                break;
+            }
+
+            int r = ext2_set_bmap(fs, inode, lbn, blk);
+
+            if (r != 0)
+            {
+                ext2_free_block(fs, blk);
+                err = r;
+                break;
+            }
+            inode->i_blocks += bs / 512;
+            phys = blk;
+            is_new = 1;
+            dirty = 1;
+        }
+
+        if (chunk == bs)
+        {
+            memcpy(tmp, (char *)src, bs);
+        }
+        else
+        {
+            if (is_new)
+                memset(tmp, 0, bs);
+            else if (ext2_read_block(fs, (uint32_t)phys, tmp) != 0)
+            {
+                err = -EIO;
+                break;
+            }
+            memcpy(tmp + off, (char *)src, chunk);
+        }
+
+        if (ext2_write_block(fs, (uint32_t)phys, (uint16_t *)tmp) != 0)
+        {
+            err = -EIO;
+            break;
+        }
+
+        src += chunk;
+        pos += chunk;
+        remaining -= chunk;
+        written += (int)chunk;
+    }
+
+    kfree(tmp);
+
+    if (written > 0 || dirty)
+    {
+        if (written > 0)
+        {
+            if (pos > inode->i_size)
+                inode->i_size = pos;
+            inode->i_mtime = inode->i_ctime = 67; // oh look its the unix timestamp that we dont have again!
+        }
+
+        if (ext2_write_inode(fs, ino, inode) != 0)
+            return -EIO;
+    }
+
+    return written > 0 ? written : err;
+}
+
 int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void *dst, uint32_t count)
 {
     static uint8_t blkbuf[EXT2_MAX_BLOCK_SIZE];

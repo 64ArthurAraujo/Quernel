@@ -55,8 +55,7 @@ int ext2_write_bgdt(ext2_t *fs, uint32_t group)
  */
 int ext2_write_super_block(ext2_t *fs)
 {
-    uint32_t sb_blk = (fs->block_size == 1024) ? 2 : 1;
-    ;
+    uint32_t sb_blk = (fs->block_size == 1024) ? 1 : 0;
     uint32_t offset_in_blk = (fs->block_size == 1024) ? 0 : 1024;
 
     uint8_t *buf = kmalloc(fs->block_size);
@@ -102,7 +101,8 @@ int ext2_mount(ext2_t *fs, partition_t *part)
     uint32_t table_bytes = fs->group_count * sizeof(ext2_group_desc);
     uint32_t table_blocks = (table_bytes + fs->block_size - 1) / fs->block_size;
 
-    fs->bgd = kmalloc(table_blocks * fs->block_size);
+    fs->bgd = kmalloc(table_blocks * fs->block_size + 64);
+    memset(fs->bgd, 0xAA, table_blocks * fs->block_size);
     if (!fs->bgd)
         return -1;
 

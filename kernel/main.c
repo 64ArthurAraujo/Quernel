@@ -35,7 +35,10 @@ void init_kernel()
 
     sleep(250);
 
-    create_and_find_file(sda);
+    // read_hello_world(sda);
+    // read_hello_world_broken(sda);
+    // create_and_find_file(sda);
+    create_write_and_read_file(sda);
 
     asm volatile("hlt");
 }
