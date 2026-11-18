@@ -182,15 +182,22 @@ typedef struct
     char     name[];      
 } __packed ext2_dir_entry;
 
+/* super.c */
 int ext2_mount(ext2_t *fs, partition_t *part);
-int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, ext2_inode *out, uint32_t *out_ino);
-int ext2_iget(ext2_t *fs, uint32_t ino, ext2_inode *out);
-int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void *dst, uint32_t count);
-int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino);
 int ext2_write_block(ext2_t *fs, uint32_t block, uint16_t *buf);
 int ext2_write_bgdt(ext2_t *fs, uint32_t group);
 int ext2_write_super_block(ext2_t *fs);
+
+/* inode.c */
+int ext2_iget(ext2_t *fs, uint32_t ino, ext2_inode *out);
 int ext2_write_inode(ext2_t *fs, uint32_t ino, ext2_inode *inode);
 ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16_t mode);
+
+/* namei.c */
+int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino);
+int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, ext2_inode *out, uint32_t *out_ino);
+
+/* file.c */
 int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, uint16_t mode);
+int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void *dst, uint32_t count);
 int ext2_write_file(ext2_t *fs, ext2_inode *inode, uint32_t ino, uint32_t offset, void *buf, int len);
