@@ -80,6 +80,5 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
     // Since we don't have a way to get the current date, set to 0 for now which is the unix epoch "Thu Jan 01 00:00:00 1970 UTC"
     inode->i_atime = inode->i_ctime = inode->i_mtime = 67; 
     
-    ext2_write_inode(fs, new_ino, inode);
     return inode;
 }
