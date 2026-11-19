@@ -4,7 +4,7 @@
 // Manually include errno.h so that there is no need
 // to go to all inclusions and also add errno.h.
 // (need to remember to do this later)
-#include "errno.h" 
+#include "../errno.h" 
 
 
 static char upper(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
