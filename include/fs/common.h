@@ -1,17 +1,11 @@
 #pragma once
 #include <stdint.h>
 
-#define ENOENT        2
-#define EIO           5
-#define ENOMEM        12
-#define EEXIST        17
-#define ENOTDIR       20
-#define EISDIR        21
-#define EINVAL        22
-#define	EFBIG		  27
-#define ENOSPC		  28
-#define ENAMETOOLONG  36
-#define ESTALE        116
+// Manually include errno.h so that there is no need
+// to go to all inclusions and also add errno.h.
+// (need to remember to do this later)
+#include "errno.h" 
+
 
 static char upper(char c) { return (c >= 'a' && c <= 'z') ? c - 32 : c; }
 
