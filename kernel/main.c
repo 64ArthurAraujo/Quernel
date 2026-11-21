@@ -1,4 +1,5 @@
 #include <quernel/printk.h>
+#include <quernel/config.h>
 #include <quernel/cpu.h>
 #include <drivers/ata.h>
 #include <drivers/tty.h>
@@ -9,6 +10,7 @@
 
 #include "do_mounts.h"
 #include "showcases.h"
+#include "qtest/tests.h"
 
 #include <fs/proc.h>
 #include <fs/ext.h>
@@ -40,13 +42,11 @@ void init_kernel()
 
     proc_write_file(root_fs, "/proc/version", "version", QUERNEL_BANNER);
 
-    sleep(250);
-
-    read_hello_world(sda);
-    // read_hello_world_broken(sda);
-    // create_and_find_file(sda);
-    // create_write_and_read_file(sda);
-    // create_and_find_folder(sda);
+#if QUER_QTEST
+    test_create_find_dir(sda);
+    sleep(5000);
+    test_create_many_folders(sda);
+#endif
 
     asm volatile("hlt");
 }
