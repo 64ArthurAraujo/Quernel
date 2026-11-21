@@ -87,26 +87,19 @@ void cpuid_detect(ext2_t *fs)
     }
 
     int v_len = strlen(cpu_info.vendor);
-    int b_len = strlen(cpu_info.vendor);
+    int b_len = strlen(cpu_info.brand);
 
     char *buf = kmalloc(v_len + b_len + 2);
 
-    int buf_i = 0;
+    int bi = 0;
+    int i = 0;
 
-    for (int i = 0; i < strlen(cpu_info.vendor); i++)
-    {
-        buf[buf_i] = cpu_info.vendor[i];
-        buf_i++;
-    }
-
-    buf[buf_i] = ' ';
-    buf_i++;
-
-    for (int i = 0; i < strlen(cpu_info.brand); i++)
-    {
-        buf[buf_i] = cpu_info.brand[i];
-        buf_i++;
-    }
+    while (i < v_len)
+        buf[bi++] = cpu_info.vendor[i++];
+    buf[bi++] = ' ';
+    i = 0;
+    while (i < b_len)
+        buf[bi++] = cpu_info.brand[i++];
 
     if (proc_write_file(fs, "/proc/cpuinfo", "cpuinfo", buf) < 0)
         pr_err("cpuid_detect: failed to create the cpuinfo proc file!\n");
