@@ -37,18 +37,13 @@ void init_kernel()
     cpuid_detect();
     ata_detect_drives();
     do_mount_root(&sda);
-
     ext2_t *root_fs = (ext2_t *)sda.volumes[vol(3)].fs;
+
+    if (test_ext2_fs(root_fs) != 0)
+        goto halt;
 
     proc_write_file(root_fs, "/proc/version", "version", QUERNEL_BANNER);
 
-#if QUER_QTEST
-    test_create_find_dir(sda);
-    sleep(5000);
-    test_create_many_folders(sda);
-
-    pr_info("QTEST: finished all tests!\n");
-#endif
-
+halt:
     asm volatile("hlt");
 }

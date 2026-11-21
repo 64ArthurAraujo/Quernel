@@ -1,4 +1,5 @@
 #include <quernel/printk.h>
+#include <quernel/config.h>
 #include <quernel/cpu.h>
 #include <drivers/ata.h>
 #include <drivers/tty.h>
@@ -10,6 +11,87 @@
 
 #include "qtest.h"
 
+static inline void pr_result(char *t)
+{
+    if (failed == 0)
+        pr_info("[OK] %s\n", t);
+    else
+        pr_err("[ER] %s: %i check(s) failed\n", t, failed);
+}
+
+/**
+ * test_filesys():
+ *
+ * Checks if the filesystem contains sane information and
+ * is not broken/corrupt.
+ */
+int test_filesys(ext2_t *fs)
+{
+    ext2_super_block sb = fs->sb;
+
+    failed = 0;
+
+    assert_that(sb.signature == EXT2_SIG, "signature is 0xef53");
+    assert_that(fs->block_size == (1024u << fs->sb.log_block_size), "block_size follows log_block_size");
+    assert_that(fs->group_count >= 1 && fs->group_count <= EXT2_MAX_GROUPS, "group_count is within a valid range");
+    assert_that(fs->group_count == (fs->sb.blocks_count + fs->sb.blocks_per_group - 1) / fs->sb.blocks_per_group, "group_count matches blocks_count / blocks_per_group");
+    assert_that(fs->inode_size >= 128, "inode_size is >= 128");
+    assert_that(fs->bgd != NULL, "block group descriptor is successfully read");
+    assert_that(S_ISDIR(fs->root_inode.i_mode), "root_inode is a dir");
+
+    ext2_t *fs2 = kmalloc(sizeof(ext2_t));
+
+    assert_that(ext2_mount(fs2, &fs->part) == 0, "remount the filesystem");
+
+    if (fs2->bgd)
+    {
+        assert_that(fs2->block_size == fs->block_size, "remounted fs's block_size is equal to the original");
+        assert_that(fs2->group_count == fs->group_count, "remounted fs's group_count is equal to the original");
+        assert_that(fs2->sb.free_inodes_count == fs->sb.free_inodes_count, "remounted super_block's free_inodes_count is equal to the original");
+        assert_that(fs2->sb.free_blocks_count == fs->sb.free_blocks_count, "remounted super_block's free_blocks_count is equal to the original");
+        assert_that(memcmp(fs2->bgd, fs->bgd, fs->group_count * sizeof(ext2_group_desc)) == 0, "remounted block group descriptor is equal to the original");
+    }
+
+    kfree(fs2);
+    pr_result("test_filesys");
+    return failed;
+}
+
+/**
+ * test_write_sb_bgd():
+ *
+ * Checks if writing the super_block and the
+ * block group descriptor works correctly.
+ */
+int test_write_sb_bgd(ext2_t *fs)
+{
+    ext2_super_block sb = fs->sb;
+
+    failed = 0;
+
+    assert_that(ext2_write_super_block(fs) == 0, "writing the superblock works");
+
+    for (uint32_t group = 0; group < fs->group_count; group++)
+    {
+        assert_that(ext2_write_bgdt(fs, group) == 0, "writing group works");
+    }
+
+    ext2_t *fs2 = kmalloc(sizeof(ext2_t));
+
+    assert_that(ext2_mount(fs2, &fs->part) == 0, "remount the filesystem after writing");
+
+    if (fs2->bgd)
+    {
+        assert_that(memcmp(&(fs2->sb), &(fs->sb), sizeof(ext2_super_block)) == 0, "superblock is unchanged");
+        assert_that(memcmp(fs2->bgd, fs->bgd, sizeof(ext2_group_desc)) == 0, "block group descriptor is unchanged");
+    }
+
+    kfree(fs2);
+
+    pr_result("test_write_sb_bgd");
+    return failed;
+}
+
 /**
  * test_create_find_dir():
  *
@@ -17,19 +99,8 @@
  * ext2_namei, that the directory looks right: type, permissions, size, link
  * counts, "." and "..", duplicate rejection and a nested mkdir.
  */
-void test_create_find_dir(root_dev sda)
+int test_create_find_dir(ext2_t *fs)
 {
-    pr_info("test_create_find_dir: starting checks\n");
-
-    dev_volume_t v = sda.volumes[vol(3)];
-
-    if (v.fs_type != EXT2_T)
-    {
-        pr_err("Oops, it seems that sda3 does not contain a ext2 fs! (volume.fs_type=%i)\n", v.fs_type);
-        return;
-    }
-
-    ext2_t *fs = (ext2_t *)v.fs;
     ext2_inode *root_dir = &(fs->root_inode);
 
     ext2_inode inode, tmp;
@@ -45,15 +116,15 @@ void test_create_find_dir(root_dev sda)
     assert_that(r == 0, "mkdir /testdir returns 0");
     if (r != 0)
     {
-        pr_err("mkdir returned %i, stopping\n", r);
-        return;
+        pr_err("mkdir returned %s, stopping\n", errno_str(r));
+        return failed;
     }
 
     /* 2. the new directory, read back from disk */
     r = ext2_namei(fs, "/testdir", &inode, &ino);
     assert_that(r == 0, "namei finds /testdir");
     if (r != 0)
-        return;
+        return failed;
 
     assert_that(S_ISDIR(inode.i_mode), "/testdir has the directory type bit");
     assert_that((inode.i_mode & 0777) == 0755, "/testdir has permissions 0755");
@@ -109,10 +180,8 @@ void test_create_find_dir(root_dev sda)
 
     (void)inner_ino;
 
-    if (failed == 0)
-        pr_info("test_create_find_dir: all checks passed\n");
-    else
-        pr_err("test_create_find_dir: %i check(s) failed\n", failed);
+    pr_result("test_create_find_dir");
+    return failed;
 }
 
 /**
@@ -122,19 +191,8 @@ void test_create_find_dir(root_dev sda)
  * overflows, which forces ext2_add_link to append a new block to the parent.
  * Directory names are d0, d1, d2, ...
  */
-void test_create_many_folders(root_dev sda)
+int test_create_many_folders(ext2_t *fs)
 {
-    pr_info("test_create_many_folders: starting checks\n");
-
-    dev_volume_t v = sda.volumes[vol(3)];
-
-    if (v.fs_type != EXT2_T)
-    {
-        pr_err("Oops, it seems that sda3 does not contain a ext2 fs! (volume.fs_type=%i)\n", v.fs_type);
-        return;
-    }
-
-    ext2_t *fs = (ext2_t *)v.fs;
     ext2_inode *root_dir = &(fs->root_inode);
 
     ext2_inode stress, tmp;
@@ -147,12 +205,12 @@ void test_create_many_folders(root_dev sda)
     r = ext2_mkdir(fs, root_dir, EXT2_ROOT_INO, "stress", 6, 0755);
     assert_that(r == 0, "mkdir /stress returns 0");
     if (r != 0)
-        return;
+        return failed;
 
     r = ext2_namei(fs, "/stress", &stress, &stress_ino);
     assert_that(r == 0, "namei finds /stress");
     if (r != 0)
-        return;
+        return failed;
 
     /* a 12 byte entry fits block_size/12 times; go past that to force growth */
     uint32_t count = fs->block_size / 12 + 10;
@@ -168,7 +226,7 @@ void test_create_many_folders(root_dev sda)
         r = ext2_mkdir(fs, &stress, stress_ino, name, len, 0755);
         if (r != 0)
         {
-            pr_err("mkdir /stress/%s failed with %i\n", name, r);
+            pr_err("mkdir /stress/%s failed with %s\n", name, errno_str(r));
             break;
         }
         created++;
@@ -201,8 +259,35 @@ void test_create_many_folders(root_dev sda)
     r = ext2_namei(fs, path, &tmp, &tmp_ino);
     assert_that(r == 0 && S_ISDIR(tmp.i_mode), "last subdirectory is reachable");
 
-    if (failed == 0)
-        pr_info("create_many_folders: all checks passed\n");
-    else
-        pr_err("create_many_folders: %i check(s) failed\n", failed);
+    pr_result("test_create_many_folders");
+    return failed;
+}
+
+/**
+ * test_ext2_fs():
+ *
+ * Entrypoint that runs all unit tests, returning 0 if all
+ * passed and 1 if something failed. Execution of the next
+ * test is stopped if the current test fails. 
+ * 
+ * NOTE:
+ * If QUER_QTEST is disabled this function will return 0 instantly.
+ */
+int test_ext2_fs(ext2_t *fs)
+{
+#if QUER_QTEST
+    int t_fs = test_filesys(fs);
+    if (t_fs > 0)
+        return 1;
+    int t_wr_sb_bgd = test_write_sb_bgd(fs);
+    if (t_wr_sb_bgd > 0)
+        return 1;
+    int t_c_f_dir = test_create_find_dir(fs);
+    if (t_c_f_dir > 0)
+        return 1;
+    int t_c_m_folders = test_create_many_folders(fs);
+    if (t_c_m_folders > 0)
+        return 1;
+#endif
+    return 0;
 }
