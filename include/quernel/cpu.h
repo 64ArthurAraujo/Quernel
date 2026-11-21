@@ -1,8 +1,11 @@
 #pragma once
 #include <stdint.h>
+#include <drivers/ata.h>
+#include <fs/ext.h>
 
 // cpuid.c
-void cpuid_detect();
+
+void cpuid_detect(ext2_t *fs);
 
 // isr.c
 void isr_setup();

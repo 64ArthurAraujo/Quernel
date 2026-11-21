@@ -5,4 +5,4 @@ typedef struct {
     char brand[49];
 } cpu_info_t;
 
-void cpuid_detect();
+void cpuid_detect(ext2_t *fs);

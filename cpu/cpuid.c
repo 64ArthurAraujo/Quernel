@@ -1,7 +1,11 @@
 #include <drivers/tty.h>
 #include <quernel/printk.h>
+#include <drivers/ata.h>
+#include <fs/proc.h>
+#include <fs/ext.h>
 #include <memory.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "cpuid.h"
 
@@ -31,11 +35,24 @@ int cpuid_supported()
     return (a != b);
 }
 
-void cpuid_detect()
+/**
+ * cpuid_read():
+ * 
+ * Reads the CPUID and writes its information into the
+ * /proc/cpuinfo, for that reason this function should be called
+ * after the mounting of a filesystem.
+ */
+void cpuid_detect(ext2_t *fs)
 {
     if (!cpuid_supported())
     {
-        printk("CPUID is not supported\n");
+        pr_err("cpuid_detect: CPUID is not supported by the processor\n");
+        return;
+    }
+
+    if (!fs)
+    {
+        pr_err("cpuid_detect: filesystem is null, unable to create /proc/cpuinfo\n");
         return;
     }
 
@@ -69,5 +86,30 @@ void cpuid_detect()
         cpu_info.brand[48] = '\0';
     }
 
-    printk("CPU: %s %s\n", cpu_info.vendor, cpu_info.brand);
+    int v_len = strlen(cpu_info.vendor);
+    int b_len = strlen(cpu_info.vendor);
+
+    char *buf = kmalloc(v_len + b_len + 2);
+
+    int buf_i = 0;
+
+    for (int i = 0; i < strlen(cpu_info.vendor); i++)
+    {
+        buf[buf_i] = cpu_info.vendor[i];
+        buf_i++;
+    }
+
+    buf[buf_i] = ' ';
+    buf_i++;
+
+    for (int i = 0; i < strlen(cpu_info.brand); i++)
+    {
+        buf[buf_i] = cpu_info.brand[i];
+        buf_i++;
+    }
+
+    if (proc_write_file(fs, "/proc/cpuinfo", "cpuinfo", buf) < 0)
+        pr_err("cpuid_detect: failed to create the cpuinfo proc file!\n");
+
+    kfree(buf);
 }

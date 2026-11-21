@@ -34,14 +34,14 @@ void init_kernel()
     init_timer(100); // 100 Hz
     init_memory();
     printk(QUERNEL_BANNER);
-    cpuid_detect();
     ata_detect_drives();
     do_mount_root(&sda);
-    ext2_t *root_fs = (ext2_t *)sda.volumes[vol(3)].fs;
 
+    ext2_t *root_fs = (ext2_t *)sda.volumes[vol(3)].fs;
     if (test_ext2_fs(root_fs) != 0)
         goto halt;
 
+    cpuid_detect(root_fs);
     proc_write_file(root_fs, "/proc/version", "version", QUERNEL_BANNER);
 
 halt:
