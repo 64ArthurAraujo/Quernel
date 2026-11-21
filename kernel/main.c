@@ -46,6 +46,8 @@ void init_kernel()
     test_create_find_dir(sda);
     sleep(5000);
     test_create_many_folders(sda);
+
+    pr_info("QTEST: finished all tests!\n");
 #endif
 
     asm volatile("hlt");

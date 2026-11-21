@@ -1,16 +1,19 @@
 #pragma once
+#include <quernel/config.h>
 
 static int failed;
 
-static inline void expect(int cond, const char *msg)
+static inline void assert_that(int cond, const char *msg)
 {
     if (cond)
     {
-        pr_info("ok:   %s\n", msg);
+        if (QUER_QTEST_VERBOSE)
+            pr_info("ok:   %s\n", msg);
     }
     else
     {
         pr_err("FAIL: %s\n", msg);
+        failed++;
     }
 }
 
