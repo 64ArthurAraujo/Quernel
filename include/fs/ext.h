@@ -2,8 +2,6 @@
 #include <quernel/macros.h>
 #include <stdint.h>
 
-// ext2
-
 /*
  * Constants relative to the data blocks
  */
@@ -33,10 +31,18 @@
 #define S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)
 #define S_ISSOCK(m)	(((m) & S_IFMT) == S_IFSOCK)
 
-
-#define EXT2_ROOT_INO 2
-
+#define EXT2_ROOT_INO   2
 #define EXT2_MAX_GROUPS 64
+#define EXT2_SIG        0xef53
+
+/*
+ * Codes for operating systems
+ */
+#define EXT2_OS_LINUX   0
+#define EXT2_OS_HURD    1
+#define EXT2_OS_MASIX   2
+#define EXT2_OS_FREEBSD 3
+#define EXT2_OS_LITES   4
 
 /*
  * Structure of an inode on the disk
@@ -181,6 +187,11 @@ typedef struct
     uint8_t  file_type;
     char     name[];      
 } __packed ext2_dir_entry;
+
+static inline uint32_t first_ino(ext2_t *fs)
+{
+    return fs->sb.rev_level == 0 ? 11 : fs->sb.s_first_ino;
+}
 
 /* super.c */
 int ext2_mount(ext2_t *fs, partition_t *part);

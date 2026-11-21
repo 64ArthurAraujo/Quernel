@@ -1,4 +1,5 @@
 #include <quernel/printk.h>
+#include <quernel/config.h>
 #include <quernel/cpu.h>
 #include <drivers/ata.h>
 #include <drivers/tty.h>
@@ -9,6 +10,7 @@
 
 #include "do_mounts.h"
 #include "showcases.h"
+#include "qtest/tests.h"
 
 #include <fs/proc.h>
 #include <fs/ext.h>
@@ -35,18 +37,13 @@ void init_kernel()
     cpuid_detect();
     ata_detect_drives();
     do_mount_root(&sda);
-
     ext2_t *root_fs = (ext2_t *)sda.volumes[vol(3)].fs;
+
+    if (test_ext2_fs(root_fs) != 0)
+        goto halt;
 
     proc_write_file(root_fs, "/proc/version", "version", QUERNEL_BANNER);
 
-    sleep(250);
-
-    read_hello_world(sda);
-    // read_hello_world_broken(sda);
-    // create_and_find_file(sda);
-    // create_write_and_read_file(sda);
-    // create_and_find_folder(sda);
-
+halt:
     asm volatile("hlt");
 }
