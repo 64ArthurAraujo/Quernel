@@ -39,6 +39,7 @@ int dir_block_has_name(uint8_t *buf, uint32_t limit, const char *name, uint8_t n
 int ext2_check_dir_block(ext2_t *fs, const uint8_t *buf, uint32_t limit);
 int ext2_find_entry(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, uint32_t *ino);
 int dir_block_insert(uint8_t *buf, uint32_t limit, uint32_t ino, const char *name, uint8_t name_len, uint8_t f_type);
+int ext2_add_link(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, const char *name, uint8_t name_len, uint32_t ino, uint8_t f_type);
 
 /* namei.c */
 int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, ext2_inode *out, uint32_t *out_ino);
@@ -49,6 +50,7 @@ int64_t ext2_read_file(ext2_t *fs, const ext2_inode *ino, uint32_t offset, void 
 
 /* ialloc.c */
 ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16_t mode);
+int ext2_free_inode(ext2_t *fs, uint32_t ino, int isdir);
 
 /* balloc.c */
 int ext2_set_bmap(ext2_t *fs, ext2_inode *inode, uint32_t n, uint32_t phys);

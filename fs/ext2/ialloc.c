@@ -33,7 +33,15 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
     }
 
     uint8_t *bitmap = kmalloc(fs->block_size);
-    ext2_read_block(fs, fs->bgd[f_group].inode_bitmap, bitmap);
+
+    if (!bitmap)
+        return NULL;
+    
+    if (ext2_read_block(fs, fs->bgd[f_group].inode_bitmap, bitmap) != 0)
+    {
+        kfree(bitmap);
+        return NULL;
+    }
 
     uint32_t start_bit = (f_group == 0) ? (fs->sb.s_first_ino - 1) : 0;
 
@@ -73,6 +81,14 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
     uint32_t new_ino = (f_group * fs->sb.inodes_per_group) + f_bit + 1;
 
     ext2_inode *inode = kmalloc(sizeof(ext2_inode));
+
+    if (!inode)
+    {
+        ext2_free_inode(fs, new_ino, S_ISDIR(mode));
+        return NULL;
+    }
+    memset(inode, 0, sizeof(ext2_inode));
+
     inode->i_mode = mode;
     inode->i_links_count = 1;
     // This is most probably not ideal but this is the only way i see passing the ino alongside the inode struct. 
@@ -81,4 +97,51 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
     inode->i_atime = inode->i_ctime = inode->i_mtime = 67; 
     
     return inode;
+}
+
+int ext2_free_inode(ext2_t *fs, uint32_t ino, int isdir)
+{
+    if (ino == 0 || ino > fs->sb.inodes_count)
+        return -EINVAL;
+
+    uint32_t group = (ino - 1) / fs->sb.inodes_per_group;
+    uint32_t bit = (ino - 1) % fs->sb.inodes_per_group;
+
+    uint8_t *bitmap = (uint8_t *)kmalloc(fs->block_size);
+    if (!bitmap)
+        return -ENOMEM;
+
+    int r = 0;
+
+    if (ext2_read_block(fs, fs->bgd[group].inode_bitmap, bitmap) != 0)
+    {
+        r = -EIO;
+        goto out;
+    }
+
+    if (!(bitmap[bit / 8] & (1 << (bit % 8))))
+    {
+        r = -EINVAL;
+        goto out;
+    }
+
+    bitmap[bit / 8] &= ~(1 << (bit % 8));
+
+    if (ext2_write_block(fs, fs->bgd[group].inode_bitmap, (uint16_t *)bitmap) != 0)
+    {
+        r = -EIO;
+        goto out;
+    }
+
+    fs->bgd[group].free_blocks_count++;
+    if (isdir && fs->bgd[group].used_dirs_count > 0)
+        fs->bgd[group].used_dirs_count--;
+    fs->sb.free_inodes_count++;
+
+    if (ext2_write_bgdt(fs, group) != 0 || ext2_write_super_block(fs) != 0)
+        r = -EIO;
+
+out:
+    kfree(bitmap);
+    return r;
 }

@@ -94,7 +94,8 @@ int ext2_find_entry(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_
             }
             if (ext2_match(len, name, de))
             {
-                *ino_out = de->inode;
+                if (ino_out)
+                    *ino_out = de->inode;
                 err = 0;
                 goto out;
             }
@@ -168,4 +169,75 @@ int dir_block_insert(uint8_t *buf, uint32_t limit, uint32_t ino, const char *nam
     }
 
     return 0;
+}
+
+int ext2_add_link(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, const char *name, uint8_t name_len, uint32_t ino, uint8_t f_type)
+{
+    uint32_t bs = fs->block_size;
+    uint32_t n_blks = (dir->i_size + bs - 1) / bs;
+    uint32_t n = 0;
+    int reclen = EXT2_DIR_REC_LEN(name_len);
+    ext2_dir_entry *de;
+    int r = 0;
+
+    uint8_t *buf = (uint8_t *)kmalloc(bs);
+    if (!buf)
+        return -ENOMEM;
+
+    for (n = 0; n < n_blks; n++)
+    {
+        int64_t phys = ext2_bmap(fs, dir, n);
+
+        if (phys <= 0 || ext2_read_block(fs, phys, buf) != 0)
+        {
+            r = -EIO;
+            goto out;
+        }
+
+        uint32_t last = dir->i_size - n * bs;
+        if (last > bs)
+            last = bs;
+
+        if (dir_block_insert(buf, last, ino, name, name_len, f_type))
+        {
+            if (ext2_write_block(fs, (uint32_t)phys, (uint16_t *)buf) != 0)
+                r = -EIO;
+
+            goto out;
+        }
+    }
+
+    uint32_t blk = ext2_alloc_block(fs, dir_ino);
+    if (blk == 0)
+    {
+        r = -ENOSPC;
+        goto out;
+    }
+
+    r = ext2_set_bmap(fs, dir, n_blks, blk);
+    if (r != 0)
+    {
+        ext2_free_block(fs, blk);
+        goto out;
+    }
+
+    memset(buf, 0, bs);
+    de = (ext2_dir_entry *)buf;
+    de->inode = 0;
+    de->rec_len = bs;
+
+    if (!dir_block_insert(buf, bs, ino, name, name_len, f_type) || ext2_write_block(fs, blk, (uint16_t *)buf) != 0)
+    {
+        ext2_set_bmap(fs, dir, n_blks, 0);
+        ext2_free_block(fs, blk);
+        r = -EIO;
+        goto out;
+    }
+
+    dir->i_blocks += bs / 512;
+    dir->i_size += bs;
+
+out:
+    kfree(buf);
+    return r;
 }

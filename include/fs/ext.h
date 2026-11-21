@@ -196,6 +196,7 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
 /* namei.c */
 int ext2_namei(ext2_t *fs, const char *path, ext2_inode *out, uint32_t *out_ino);
 int ext2_lookup(ext2_t *fs, const ext2_inode *dir, const char *name, uint32_t len, ext2_inode *out, uint32_t *out_ino);
+int ext2_mkdir(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, const char *name, int len, int mode);
 
 /* file.c */
 int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, uint16_t mode);
