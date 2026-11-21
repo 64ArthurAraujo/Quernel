@@ -263,13 +263,49 @@ int test_create_many_folders(ext2_t *fs)
     return failed;
 }
 
+int test_new_inode(ext2_t *fs)
+{
+    ext2_inode *root_dir = &(fs->root_inode);
+
+    failed = 0;
+
+    // the number of free inodes before a new inode
+    uint32_t prev_free_inodes_count = fs->sb.free_inodes_count;
+
+    ext2_inode *f_inode = ext2_new_inode(fs, root_dir, EXT2_ROOT_INO, S_IFREG | 0644);
+    assert_that(f_inode != NULL, "ext2_new_inode returns a non-null pointer");
+
+    if (!f_inode)
+        return failed;
+
+    uint32_t ino = f_inode->osd1.masix1.m_i_reserved1;
+
+    assert_that(ino >= first_ino(fs) && ino <= fs->sb.inodes_count, "new inode number is within a reasonable range");
+    assert_that(f_inode->i_mode == (S_IFREG | 0644), "inode->i_mode is correctly assigned");
+    assert_that(f_inode->i_links_count == 1, "inode links count is 1");
+    assert_that(f_inode->i_size == 0, "i_size is zero");
+    assert_that(f_inode->i_blocks == 0, "i_blocks is zero");
+    assert_that(f_inode->i_flags == 0 && f_inode->i_file_acl == 0 && f_inode->i_generation == 0, "flags/acl/generation are zeroed");
+
+    int blocks_zero = 1;
+    for (int i = 0; i < EXT2_N_BLOCKS; i++)
+        if (f_inode->i_block[i])
+            blocks_zero = 0;
+    assert_that(blocks_zero, "i_block[] is zeroed");
+
+    assert_that(fs->sb.free_inodes_count == (prev_free_inodes_count - 1), "super_block's free_inodes_count decreased by one");
+
+    pr_result("test_new_inode");
+    return failed;
+}
+
 /**
  * test_ext2_fs():
  *
  * Entrypoint that runs all unit tests, returning 0 if all
  * passed and 1 if something failed. Execution of the next
- * test is stopped if the current test fails. 
- * 
+ * test is stopped if the current test fails.
+ *
  * NOTE:
  * If QUER_QTEST is disabled this function will return 0 instantly.
  */
@@ -287,6 +323,9 @@ int test_ext2_fs(ext2_t *fs)
         return 1;
     int t_c_m_folders = test_create_many_folders(fs);
     if (t_c_m_folders > 0)
+        return 1;
+    int t_n_inode = test_new_inode(fs);
+    if (t_n_inode > 0)
         return 1;
 #endif
     return 0;

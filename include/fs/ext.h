@@ -188,6 +188,11 @@ typedef struct
     char     name[];      
 } __packed ext2_dir_entry;
 
+static inline uint32_t first_ino(ext2_t *fs)
+{
+    return fs->sb.rev_level == 0 ? 11 : fs->sb.s_first_ino;
+}
+
 /* super.c */
 int ext2_mount(ext2_t *fs, partition_t *part);
 int ext2_write_block(ext2_t *fs, uint32_t block, uint16_t *buf);
