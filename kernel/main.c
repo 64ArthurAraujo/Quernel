@@ -1,6 +1,7 @@
 #include <quernel/printk.h>
 #include <quernel/cpu.h>
 #include <drivers/ata.h>
+#include <drivers/tty.h>
 #include <quernel/dev.h>
 #include <stdint.h>
 #include <memory.h>
@@ -9,7 +10,10 @@
 #include "do_mounts.h"
 #include "showcases.h"
 
+#include <fs/proc.h>
 #include <fs/ext.h>
+
+#define QUERNEL_BANNER "Quernel version 0.0.0.i686\n"
 
 static root_dev sda = {0};
 
@@ -22,16 +26,19 @@ void init_memory()
 
 void init_kernel()
 {
-    printk("Quernel version 0.0.0.i686\n");
-
     isr_setup();
     asm volatile("sti");
 
     init_timer(100); // 100 Hz
     init_memory();
+    printk(QUERNEL_BANNER);
     cpuid_detect();
     ata_detect_drives();
     do_mount_root(&sda);
+
+    ext2_t *root_fs = (ext2_t *)sda.volumes[vol(3)].fs;
+
+    proc_write_file(root_fs, "/proc/version", "version", QUERNEL_BANNER);
 
     sleep(250);
 
@@ -39,6 +46,7 @@ void init_kernel()
     // read_hello_world_broken(sda);
     // create_and_find_file(sda);
     // create_write_and_read_file(sda);
+    // create_and_find_folder(sda);
 
     asm volatile("hlt");
 }

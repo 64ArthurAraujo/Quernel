@@ -7,7 +7,7 @@ int ext2_write_block(ext2_t *fs, uint32_t block, uint16_t *buf)
 {
     uint32_t spb = fs->block_size / 512;
     for (uint32_t i = 0; i < spb; i++)
-        if (write_partition(&fs->part, block * spb + i, buf + i * 512) != 0)
+        if (write_partition(&fs->part, block * spb + i, (uint8_t *)buf + i * 512) != 0)
             return -1;
     return 0;
 }

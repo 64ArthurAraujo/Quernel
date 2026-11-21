@@ -69,10 +69,6 @@ int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, 
     f_inode->i_size = 0;
     f_inode->i_blocks = 0;
 
-    // When creating ext2_new_inode ive set it to automatically write the inode to the disk
-    // but here we would want to change other properties of the inode before writing it.
-    // Remember later to remove the ext2_write_inode from ext2_new_inode so that we dont need to
-    // write it two times for no reason like we are going to do right bellow.
     if (ext2_write_inode(fs, f_ino, f_inode) != 0)
     {
         r = -EIO;

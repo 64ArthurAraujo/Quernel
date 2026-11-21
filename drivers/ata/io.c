@@ -131,7 +131,7 @@ int read_partition(partition_t *p, uint32_t sector, void *buf)
     return ata_data_xfer(buf, p->drive, p->start + sector, DATA_XFER_R);
 }
 
-int write_partition(partition_t *p, uint32_t sector, uint16_t *buf)
+int write_partition(partition_t *p, uint32_t sector, void *buf)
 {
     if (sector >= p->count)
         return -1;

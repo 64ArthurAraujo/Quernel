@@ -25,4 +25,4 @@ ata_drive_t* get_ata_drives();
 
 int ata_data_xfer(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset, int rw);
 int read_partition(partition_t *p, uint32_t sector, void *buf);
-int write_partition(partition_t *p, uint32_t sector, uint16_t *buf);
+int write_partition(partition_t *p, uint32_t sector, void *buf);
