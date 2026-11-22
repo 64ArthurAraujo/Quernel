@@ -93,7 +93,6 @@ int proc_write_file(ext2_t *fs, const char *path, char *name, char *buf)
         return -1;
     }
 
-end:
     kfree(proc_inode);
     kfree(inode);
     return 0;
