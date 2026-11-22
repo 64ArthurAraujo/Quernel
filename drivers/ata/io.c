@@ -6,6 +6,8 @@
 
 #include "ata.h"
 
+#define ATA_TIMEOUT (5000000 * 2)
+
 void read_sector_data(uint16_t base, uint16_t *buffer)
 {
     for (int i = 0; i < 256; i++)
@@ -15,7 +17,7 @@ void read_sector_data(uint16_t base, uint16_t *buffer)
 static int ata_wait_for_drq(uint16_t base)
 {
     uint8_t status;
-    uint32_t timeout = 500000;
+    uint32_t timeout = ATA_TIMEOUT;
 
     while (timeout--)
     {
@@ -98,7 +100,7 @@ int ata_data_xfer(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset, int
         ata_delay(ctrl);
 
         uint8_t status;
-        uint32_t timeout = 500000;
+        uint32_t timeout = ATA_TIMEOUT;
         while (((status = port_byte_in(base + ATA_REG_STATUS)) & ATA_SR_BSY) && --timeout)
             ;
 
@@ -110,7 +112,7 @@ int ata_data_xfer(uint16_t *buffer, ata_drive_t *drive, uint32_t lba_offset, int
 
         port_byte_out(base + ATA_REG_COMMAND, ATA_CMD_FLUSHCACHE);
 
-        timeout = 500000;
+        timeout = ATA_TIMEOUT;
         while (((status = port_byte_in(base + ATA_REG_STATUS)) & ATA_SR_BSY) && --timeout)
             ;
             
