@@ -52,6 +52,7 @@ int test_filesys(ext2_t *fs)
         assert_that(memcmp(fs2->bgd, fs->bgd, fs->group_count * sizeof(ext2_group_desc)) == 0, "remounted block group descriptor is equal to the original");
     }
 
+    kfree(fs2->bgd);
     kfree(fs2);
     pr_result("test_filesys");
     return failed;
@@ -86,6 +87,7 @@ int test_write_sb_bgd(ext2_t *fs)
         assert_that(memcmp(fs2->bgd, fs->bgd, sizeof(ext2_group_desc)) == 0, "block group descriptor is unchanged");
     }
 
+    kfree(fs2->bgd);
     kfree(fs2);
 
     pr_result("test_write_sb_bgd");
