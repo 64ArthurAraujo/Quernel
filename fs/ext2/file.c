@@ -1,4 +1,5 @@
 #include <quernel/printk.h>
+#include <drivers/rtc.h>
 #include <fs/gpt.h>
 #include <fs/ext.h>
 
@@ -100,7 +101,7 @@ int ext2_create_file(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, char *name, 
     }
 
 update_dir:
-    dir->i_atime = dir->i_ctime = 67; // again we will need to deal with that later when we can get the unix timestamp
+    dir->i_atime = dir->i_ctime = unix_time_now(); 
     if (ext2_write_inode(fs, dir_ino, dir) != 0)
         r = -EIO;
 out:
@@ -221,7 +222,7 @@ int ext2_write_file(ext2_t *fs, ext2_inode *inode, uint32_t ino, uint32_t offset
         {
             if (pos > inode->i_size)
                 inode->i_size = pos;
-            inode->i_mtime = inode->i_ctime = 67; // oh look its the unix timestamp that we dont have again!
+            inode->i_mtime = inode->i_ctime = unix_time_now();
         }
 
         if (ext2_write_inode(fs, ino, inode) != 0)

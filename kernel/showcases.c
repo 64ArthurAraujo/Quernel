@@ -102,7 +102,6 @@ void create_and_find_file(root_dev sda)
 
     if (ext2_namei(ext2_part, "/test", &inode, &ino) == 0)
     {
-        // if everything is correct the i_ctime should be 67, at least while we are not able to get the current unix timestamp.
         pr_debug("We found the created test file!\n i_ctime=%i", inode.i_ctime);
     }
     else

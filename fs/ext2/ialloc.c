@@ -1,4 +1,5 @@
 #include <quernel/printk.h>
+#include <drivers/rtc.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -94,7 +95,7 @@ ext2_inode *ext2_new_inode(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, uint16
     // This is most probably not ideal but this is the only way i see passing the ino alongside the inode struct. 
     inode->osd1.masix1.m_i_reserved1 = new_ino;
     // Since we don't have a way to get the current date, set to 0 for now which is the unix epoch "Thu Jan 01 00:00:00 1970 UTC"
-    inode->i_atime = inode->i_ctime = inode->i_mtime = 67; 
+    inode->i_atime = inode->i_ctime = inode->i_mtime = unix_time_now(); 
     
     return inode;
 }

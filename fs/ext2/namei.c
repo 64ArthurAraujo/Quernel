@@ -1,4 +1,5 @@
 #include <quernel/printk.h>
+#include <drivers/rtc.h>
 #include <memory.h>
 #include <stddef.h>
 #include <string.h>
@@ -162,7 +163,7 @@ int ext2_mkdir(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, const char *name, 
     inode->i_mode = S_IFDIR | (mode & 0777);
     if (dir->i_mode & S_ISGID)
         inode->i_mode |= S_ISGID;
-    inode->i_mtime = inode->i_atime = 67;
+    inode->i_mtime = inode->i_atime = unix_time_now();
 
     if (ext2_write_inode(fs, inode_ino, inode) < 0)
     {
@@ -175,7 +176,7 @@ int ext2_mkdir(ext2_t *fs, ext2_inode *dir, uint32_t dir_ino, const char *name, 
         goto err_free_blk;
 
     dir->i_links_count++;
-    dir->i_mtime = dir->i_ctime = 67;
+    dir->i_mtime = dir->i_ctime = unix_time_now();
 
     if (ext2_write_inode(fs, dir_ino, dir) != 0)
         r = -EIO;
