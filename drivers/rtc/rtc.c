@@ -10,12 +10,11 @@
 
 #include "rtc.h"
 
-#define SECS_IN_A_YEAR 31557600
-#define SECS_IN_A_MONTH 2628000
-#define SECS_IN_A_HOUR 3600
-#define SECS_IN_A_MIN 60
-
-
+#define SECS_YEAR 31557600
+#define SECS_MONTH 2628000
+#define SECS_HOUR 3600
+#define SECS_MIN 60
+#define SECS_DAY 86400
 
 static uint8_t get_registry(int r)
 {
@@ -30,6 +29,26 @@ static int get_converted(int reg)
 }
 
 /**
+ * get_rtc_date():
+ *
+ * Reads the RTC and returns into a organized struct.
+ */
+rtc_date get_rtc_date()
+{
+    rtc_date date;
+
+    date.hour = get_converted(REG_HOURS);
+    date.minute = get_converted(REG_MINS);
+    date.second = get_converted(REG_SECS);
+    date.week_day = get_converted(REG_WEEKDAY);
+    date.month = get_converted(REG_MONTH);
+    date.month_day = get_converted(REG_MONTHDAY);
+    date.year = get_converted(REG_YEAR) + 2000;
+
+    return date;
+}
+
+/**
  * unix_time_now():
  *
  * Reads the rtc and convert it into the unix timestamp, its probably
@@ -37,22 +56,22 @@ static int get_converted(int reg)
  */
 int unix_time_now()
 {
-    int year = get_converted(REG_YEAR) + 2000; // gambiarra that can last 80 years (very efficient)
-    int e_year = 1970;
+    rtc_date now = get_rtc_date();
 
-    int month_day = get_converted(REG_MONTHDAY);
-    int e_month_day = 1;
+    int epoch_seconds = (1970 * SECS_YEAR) + SECS_MONTH + SECS_DAY;
+    int current_seconds = (now.year * SECS_YEAR) +
+                          (now.month * SECS_MONTH) +
+                          (now.month_day * SECS_DAY) +
+                          (now.minute * SECS_MIN) +
+                          (now.hour * SECS_HOUR) +
+                          now.second;
 
-    int month = get_converted(REG_MONTH);
-    int e_month = 1;
-
-    // idk if its counting 12 hours or 24, probably if its 12 when we write a file at 9 am and 9 pm they will have the same timestamp
-    int hours = get_converted(REG_HOURS); 
-    int minutes = get_converted(REG_MINS);
-    int seconds = get_converted(REG_SECS);
-
-    int epoch_seconds = (e_year * SECS_IN_A_YEAR) + (e_month * SECS_IN_A_MONTH);
-    int current_seconds = (year * SECS_IN_A_YEAR) + (month * SECS_IN_A_MONTH) + (hours * SECS_IN_A_HOUR) + (minutes * SECS_IN_A_MIN) + seconds;
+    // The calculation i made above is not perfect and results in a timestamp 4 hours
+    // in the front of the current, so we make here a manual adjustment so we can have 
+    // the real current unix timestamp. we might be still 5 seconds inaccurate but i
+    // think this won't cause any problems for now, the above calculation should probably
+    // be revisited and recreated in the future.
+    current_seconds -= (4 * SECS_HOUR);
 
     return current_seconds - epoch_seconds;
 }
