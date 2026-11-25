@@ -32,4 +32,18 @@ typedef struct
     int n_mounted_volumes; /* The total number of mounted partitions within this drive */
 } root_dev;
 
+/**
+ * fs_name():
+ * 
+ * Returns the pretty name of the filesystem.
+ */
+static inline const char* fs_name(fs_t fs) {
+    switch (fs) {
+        case FAT12_T: return "fat12";
+        case HFSP_T:  return "hfs+";
+        case EXT2_T:  return "ext2";
+        default:      return "";
+    }
+}
+
 #define vol(n) (n > 0 ? n-1 : 0) /* "Translate" a volume number to an array position */
